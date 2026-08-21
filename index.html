@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>document.documentElement.classList.add('js')</script>
+<title>BRONYARUN — автоматизация бизнеса · живая демонстрация</title>
+
+<!-- ════════════════════════════════════════════════════════════════
+     НАСТРОЙКА · поменяйте два значения ниже и всё заработает
+     1) TG      — ваш ник в Telegram, без @
+     2) SITE    — адрес, по которому лежит презентация (после хостинга)
+     ════════════════════════════════════════════════════════════════ -->
+<script>
+  var TG   = "bronyarun";                     // ← ваш ник в Telegram
+  var SITE = "https://ваш-адрес.netlify.app"; // ← адрес презентации
+</script>
+
+<!-- Превью ссылки в Telegram / WhatsApp / соцсетях.
+     После хостинга замените АДРЕС на тот же адрес, что и в SITE выше. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Всё, что вы делаете за компьютером, можно автоматизировать">
+<meta property="og:description" content="Живая презентация: 5 рабочих демо внутри. Воронка, чат-бот, сеть агентов, конструктор сценариев и счётчик вашей рутины.">
+<meta property="og:image" content="https://ваш-адрес.netlify.app/og.png">
+<meta property="og:site_name" content="BRONYARUN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Всё, что вы делаете за компьютером, можно автоматизировать">
+<meta name="twitter:description" content="Живая презентация: 5 рабочих демо внутри.">
+<meta name="twitter:image" content="https://ваш-адрес.netlify.app/og.png">
+<meta name="description" content="Автоматизация бизнеса: чат-боты, автоворонки, агенты. Живая презентация с пятью работающими демо.">
+<meta name="theme-color" content="#020108">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#020108;
+  --surface:rgba(12,6,26,.72);
+  --surface-2:rgba(18,10,38,.85);
+  --line:rgba(0,240,255,.18);
+  --line-soft:rgba(0,240,255,.09);
+  --cyan:#00F0FF;
+  --mag:#FF2E88;
+  --violet:#7B2FFF;
+  --amber:#FFB020;
+  --paper:#E4F0FF;
+  --muted:#7E87AE;
+  --display:"Unbounded",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html,body{min-height:100%}
+body{
+  background:var(--bg);color:var(--paper);font-family:var(--body);
+  font-size:17px;line-height:1.5;overflow:auto;-webkit-font-smoothing:antialiased;
+}
+html.js,html.js body{height:100%;height:100dvh}
+html.js body{overflow:hidden}
+::selection{background:var(--mag);color:#fff}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(1000px 560px at 82% -12%, rgba(255,46,136,.13), transparent 62%),
+    radial-gradient(820px 560px at -10% 112%, rgba(0,240,255,.12), transparent 60%),
+    radial-gradient(760px 520px at 50% 122%, rgba(123,47,255,.10), transparent 65%);
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:3;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 95% at 50% 50%, transparent 55%, rgba(0,0,0,.55));
+  opacity:.55;
+}
+.bg-grid{
+  position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.55;
+  background-image:
+    linear-gradient(rgba(0,240,255,.055) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,240,255,.055) 1px,transparent 1px);
+  background-size:72px 72px;
+  -webkit-mask-image:radial-gradient(125% 95% at 50% 38%,#000 18%,transparent 78%);
+          mask-image:radial-gradient(125% 95% at 50% 38%,#000 18%,transparent 78%);
+}
+.nojs{display:none}
+html:not(.js) .nojs{
+  display:block;position:fixed;left:0;right:0;top:0;z-index:99;
+  background:#FF2E88;color:#fff;padding:14px 18px;
+  font-family:var(--mono);font-size:13px;line-height:1.55;text-align:center;
+}
+html:not(.js) .deck{padding-top:64px}
+html:not(.js) .nav{display:none}
+
+/* ---------- ambient scene: рабочее место → сервер → агенты ---------- */
+.bg-scene{
+  position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.42;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.18) 34%,#000 66%);
+          mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.18) 34%,#000 66%);
+  transition:opacity .6s ease;
+}
+body.hero .bg-scene{opacity:.62}
+.bg-scene svg{width:100%;height:100%;display:block}
+.bg-scene path,.bg-scene rect,.bg-scene circle,.bg-scene line{fill:none;stroke:#00F0FF;stroke-width:1.1;vector-effect:non-scaling-stroke}
+.sc-floor path{stroke:rgba(0,240,255,.16)}
+.sc-wall path{stroke:rgba(126,135,174,.16)}
+.sc-desk path{stroke:rgba(126,135,174,.3)}
+.sc-mon .case{stroke:rgba(0,240,255,.5)}
+.sc-mon .screen{stroke:rgba(0,240,255,.35);fill:rgba(0,240,255,.045)}
+.sc-mon .ln{stroke:rgba(0,240,255,.35);animation:scLine 4.2s ease-in-out infinite}
+@keyframes scLine{0%,100%{opacity:.25}50%{opacity:.9}}
+.sc-rack .box{stroke:rgba(0,240,255,.45)}
+.sc-rack .u{stroke:rgba(126,135,174,.35)}
+.sc-rack .led{stroke:none;fill:#00F0FF;animation:scLed 2.2s steps(1) infinite}
+@keyframes scLed{0%,49%{opacity:.15}50%,100%{opacity:.85}}
+.sc-mesh line{stroke:rgba(0,240,255,.14)}
+.sc-mesh circle{fill:#00F0FF;stroke:none;animation:scNode 2.8s ease-in-out infinite}
+@keyframes scNode{0%,100%{opacity:.2}50%{opacity:.85}}
+.sc-flow rect{fill:#00F0FF;stroke:none;opacity:0;animation:scFlow 6.4s linear infinite}
+@keyframes scFlow{
+  0%{transform:translate(352px,470px);opacity:0}
+  12%{opacity:.9}
+  86%{opacity:.9}
+  100%{transform:translate(902px,332px);opacity:0}
+}
+.sc-queue g{stroke:rgba(255,46,136,.5);stroke-width:1.4;opacity:0;animation:scQueue 14s linear infinite}
+@keyframes scQueue{
+  0%{transform:translate(120px,690px) scale(1);opacity:0}
+  8%{opacity:.75}
+  62%{transform:translate(330px,560px) scale(.72);opacity:.75}
+  80%,100%{transform:translate(352px,500px) scale(.3);opacity:0}
+}
+@media (max-width:820px){
+  .bg-scene{opacity:.28;
+    -webkit-mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.2) 38%,#000 78%);
+            mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.2) 38%,#000 78%)}
+  body.hero .bg-scene{opacity:.38}
+}
+@media (prefers-reduced-motion:reduce){.bg-scene *{animation:none!important}}
+.bg-accent{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(760px 520px at 78% 8%, hsla(var(--acc,190) 100% 55% / .10), transparent 62%);
+  transition:background .6s ease;
+}
+
+/* ---------- deck shell ---------- */
+.deck{position:relative;z-index:1}
+html.js .deck{height:100%;display:flex;flex-direction:column}
+.topbar{
+  display:flex;align-items:center;gap:18px;padding:20px clamp(20px,5vw,64px) 0;
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);flex:0 0 auto;
+}
+.topbar .brand{color:var(--paper)}
+.topbar .brand b{color:var(--cyan);font-weight:500;text-shadow:0 0 12px rgba(0,240,255,.6)}
+.topbar .act{color:var(--cyan);letter-spacing:.18em}
+.topbar .sys i{color:var(--mag);font-style:normal;animation:blink 1s steps(1) infinite}
+.counter{margin-left:auto;color:var(--cyan);text-shadow:0 0 10px rgba(0,240,255,.5)}
+.track{height:2px;background:rgba(0,240,255,.10);margin:16px clamp(20px,5vw,64px) 0;flex:0 0 auto;position:relative;overflow:hidden}
+.track i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--cyan),var(--mag));width:0;transition:width .45s cubic-bezier(.2,.7,.2,1);box-shadow:0 0 12px rgba(0,240,255,.7)}
+
+.stage{position:relative}
+html.js .stage{flex:1 1 auto;overflow-y:auto;overflow-x:hidden}
+.slide{position:static;display:block;padding:clamp(30px,6vh,64px) clamp(20px,5vw,64px);max-width:1180px;border-top:1px solid var(--line-soft)}
+html.js .slide{position:absolute;inset:0;display:none;border-top:none;padding:clamp(24px,4.5vh,52px) clamp(20px,5vw,64px) 110px}
+html.js .slide.on{display:block;animation:rise .42s cubic-bezier(.2,.7,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- type ---------- */
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin-bottom:20px;text-shadow:0 0 10px rgba(0,240,255,.4)}
+.eyebrow::before{content:"> "}
+.eyebrow::after{content:" //"}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(27px,5.2vw,60px);line-height:1.04;text-transform:uppercase;text-wrap:balance;text-shadow:0 0 34px rgba(0,240,255,.22)}
+h2{font-family:var(--display);font-weight:800;font-size:clamp(21px,3.3vw,37px);line-height:1.12;margin-bottom:22px;text-wrap:balance;text-shadow:0 0 24px rgba(0,240,255,.16)}
+h3{font-family:var(--display);font-weight:700;font-size:17px;margin-bottom:8px}
+.lede{font-size:clamp(16px,1.6vw,20px);color:var(--muted);max-width:62ch;margin-top:22px;line-height:1.55}
+p+p{margin-top:14px}
+.dim{color:var(--muted)}
+.hl{color:var(--cyan);text-shadow:0 0 26px rgba(0,240,255,.55)}
+.hl-m{color:var(--mag);text-shadow:0 0 26px rgba(255,46,136,.5)}
+.cur{display:inline-block;color:var(--cyan);animation:blink 1s steps(1) infinite;text-shadow:0 0 16px rgba(0,240,255,.8)}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- pieces ---------- */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin-top:26px}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);padding:22px 20px;backdrop-filter:blur(4px)}
+.card::before{content:"";position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan)}
+.card::after{content:"";position:absolute;bottom:-1px;right:-1px;width:14px;height:14px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan)}
+.card .k{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);margin-bottom:12px}
+.card p{font-size:15.5px;color:var(--muted)}
+.card p strong{color:var(--paper);font-weight:600}
+
+.rows{margin-top:26px;border-top:1px solid var(--line-soft)}
+.row{display:flex;gap:22px;padding:15px 0;border-bottom:1px solid var(--line-soft);align-items:baseline}
+.row .tag{font-family:var(--mono);font-size:11px;color:var(--cyan);flex:0 0 96px;letter-spacing:.08em;padding-top:2px;text-shadow:0 0 8px rgba(0,240,255,.4)}
+.row .txt{flex:1;font-size:16px}
+.row .txt b{font-weight:600}
+.row .txt span{color:var(--muted)}
+
+.big{font-family:var(--display);font-weight:900;font-size:clamp(58px,12vw,132px);line-height:.9;letter-spacing:-.01em;color:var(--cyan);position:relative;text-shadow:0 0 44px rgba(0,240,255,.45)}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;top:0;pointer-events:none;text-shadow:none;opacity:0}
+.glitch::before{color:var(--mag);animation:gl-a 3.4s infinite steps(1)}
+.glitch::after{color:var(--cyan);animation:gl-b 2.9s infinite steps(1)}
+@keyframes gl-a{0%,86%{transform:none;opacity:0}88%{transform:translate(-5px,2px);opacity:.85;clip-path:inset(12% 0 54% 0)}92%{transform:translate(4px,-1px);opacity:.85;clip-path:inset(58% 0 6% 0)}96%{transform:translate(-2px,1px);opacity:.55;clip-path:inset(32% 0 28% 0)}100%{transform:none;opacity:0}}
+@keyframes gl-b{0%,80%{transform:none;opacity:0}83%{transform:translate(5px,-2px);opacity:.8;clip-path:inset(44% 0 18% 0)}89%{transform:translate(-4px,2px);opacity:.8;clip-path:inset(6% 0 68% 0)}94%{transform:none;opacity:0}}
+.big-note{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:16px;max-width:30ch;line-height:1.7}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(24px,5vw,64px);align-items:start;margin-top:8px}
+
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:26px;border:1px solid var(--line)}
+.vs>div{padding:24px 22px}
+.vs>div:first-child{background:rgba(255,255,255,.02);border-right:1px solid var(--line)}
+.vs>div:last-child{background:var(--surface-2)}
+.vs h3{color:var(--muted);font-size:12px;font-family:var(--mono);font-weight:400;letter-spacing:.16em;text-transform:uppercase;margin-bottom:16px}
+.vs>div:last-child h3{color:var(--cyan)}
+.vs ul{list-style:none;font-size:15.5px}
+.vs li{padding:7px 0 7px 18px;position:relative;color:var(--muted)}
+.vs li::before{content:"";position:absolute;left:0;top:15px;width:6px;height:1px;background:var(--line)}
+.vs>div:last-child li{color:var(--paper)}
+.vs>div:last-child li::before{background:var(--cyan);box-shadow:0 0 6px rgba(0,240,255,.6)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:7px 12px;border:1px solid var(--line);color:var(--muted);background:rgba(0,240,255,.03)}
+.chip b{color:var(--cyan);font-weight:500}
+
+/* ---------- terminal window (общая рамка всех демо) ---------- */
+.kiosk{margin-top:22px;border:1px solid var(--line);background:rgba(2,1,8,.88);box-shadow:0 0 60px rgba(0,240,255,.07), inset 0 0 90px rgba(0,0,0,.55);min-height:380px;position:relative}
+.kiosk-titlebar{display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.kd{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.kd.r{background:var(--mag);box-shadow:0 0 8px rgba(255,46,136,.7)}
+.kd.y{background:var(--amber);box-shadow:0 0 8px rgba(255,176,32,.6)}
+.kd.g{background:var(--cyan);box-shadow:0 0 8px rgba(0,240,255,.7)}
+.kiosk-titlebar .tt{margin-left:8px}
+.kiosk-titlebar .score{margin-left:auto;color:var(--cyan);text-shadow:0 0 10px rgba(0,240,255,.5);white-space:nowrap}
+.kiosk-body{padding:clamp(18px,3vw,30px)}
+.q-line{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--cyan);text-transform:uppercase;margin-bottom:10px}
+.ascii-bar{font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--cyan);margin-bottom:20px;text-shadow:0 0 8px rgba(0,240,255,.5)}
+.ascii-bar .e{color:rgba(0,240,255,.25);text-shadow:none}
+.q{font-family:var(--display);font-weight:700;font-size:clamp(18px,2.3vw,26px);line-height:1.2;margin-bottom:22px;min-height:1.3em}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.opt{font-family:var(--body);font-size:15.5px;font-weight:500;color:var(--paper);background:rgba(0,240,255,.02);border:1px solid var(--line);padding:16px 15px;text-align:left;cursor:pointer;transition:border-color .16s,box-shadow .16s,transform .16s,background .16s}
+.opt::before{content:"▸ ";color:var(--cyan);opacity:0;transition:opacity .15s}
+.opt:hover{border-color:var(--cyan);background:rgba(0,240,255,.06);transform:translateY(-1px);box-shadow:0 0 22px rgba(0,240,255,.22)}
+.opt:hover::before{opacity:1}
+.opt:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.log{margin-top:20px;font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.9}
+.log .ok{color:var(--cyan)}
+.result .rt{font-family:var(--display);font-weight:800;font-size:clamp(19px,2.6vw,29px);line-height:1.15;margin-bottom:10px;text-shadow:0 0 20px rgba(0,240,255,.25)}
+.result .rd{color:var(--muted);font-size:16px;max-width:56ch}
+.status{display:inline-block;padding:6px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.22em;border:1px solid currentColor;margin-bottom:16px}
+.status.hot{color:var(--mag);box-shadow:0 0 20px rgba(255,46,136,.35), inset 0 0 12px rgba(255,46,136,.12)}
+.status.warm{color:var(--amber);box-shadow:0 0 20px rgba(255,176,32,.3), inset 0 0 12px rgba(255,176,32,.1)}
+.status.cold{color:var(--muted)}
+.scorebar{height:6px;background:rgba(255,255,255,.06);margin:14px 0 20px;position:relative;max-width:420px}
+.scorebar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--cyan),var(--mag));box-shadow:0 0 14px rgba(0,240,255,.5);transition:width .7s cubic-bezier(.2,.7,.2,1)}
+.magnet{margin-top:22px;border:1px dashed var(--cyan);padding:16px 18px;background:rgba(0,240,255,.05);font-size:15px;box-shadow:inset 0 0 24px rgba(0,240,255,.05)}
+.magnet b{color:var(--cyan);font-weight:600;text-shadow:0 0 10px rgba(0,240,255,.4)}
+.restart{margin-top:20px;background:none;border:none;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;padding:0}
+.restart:hover{color:var(--cyan)}
+.fld{margin-bottom:18px;max-width:420px}
+.fld label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.tin{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line);color:var(--paper);font-family:var(--mono);font-size:15px;padding:9px 2px;outline:none;transition:border-color .16s, box-shadow .16s}
+.tin:focus{border-color:var(--cyan);box-shadow:0 1px 0 var(--cyan)}
+.cta-btn{margin-top:20px;background:var(--mag);color:#06020D;border:none;cursor:pointer;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:16px 28px;box-shadow:0 0 26px rgba(255,46,136,.45);transition:box-shadow .16s, transform .16s}
+.cta-btn:hover{box-shadow:0 0 40px rgba(255,46,136,.7);transform:translateY(-1px)}
+.cap-note{color:var(--muted);font-size:13.5px;max-width:58ch;margin-top:18px}
+.collected{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:24px;padding-top:18px;border-top:1px solid var(--line-soft)}
+.ck{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.cchip{font-family:var(--mono);font-size:11px;padding:5px 10px;background:rgba(0,240,255,.07);border:1px solid rgba(0,240,255,.35);color:var(--cyan)}
+.cchip.dim{border-style:dashed;border-color:var(--line);color:var(--muted);background:transparent}
+.lead{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--cyan);padding:22px;font-family:var(--mono);font-size:13.5px;line-height:2;margin-top:8px;box-shadow:0 0 40px rgba(0,240,255,.06)}
+.lead .l{color:var(--muted)}
+.lead .v{color:var(--paper)}
+.lead .score{color:var(--mag);text-shadow:0 0 10px rgba(255,46,136,.5)}
+.gate{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);border:1px solid rgba(255,176,32,.45);padding:5px 11px;margin-bottom:14px;box-shadow:inset 0 0 18px rgba(255,176,32,.08)}
+.locked{position:relative;filter:blur(5px);opacity:.5;pointer-events:none;user-select:none}
+.prize{border:1px solid var(--cyan);padding:20px 20px 22px;margin-top:4px;background:linear-gradient(180deg,rgba(0,240,255,.10),rgba(0,240,255,.015));box-shadow:0 0 44px rgba(0,240,255,.13)}
+.prize .pk{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);margin-bottom:10px}
+.prize .pt{font-family:var(--display);font-weight:800;font-size:clamp(18px,2.4vw,25px);line-height:1.15}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:16px;margin:18px 0 4px}
+.metric b{display:block;font-family:var(--display);font-weight:900;font-size:clamp(24px,3.4vw,32px);color:var(--cyan);line-height:1;text-shadow:0 0 24px rgba(0,240,255,.4)}
+.metric span{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:7px;line-height:1.5}
+.forkq{font-family:var(--display);font-weight:700;font-size:clamp(17px,2.1vw,22px);margin:22px 0 14px;line-height:1.2}
+.forkbtns{display:flex;gap:10px;flex-wrap:wrap}
+.fb{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:14px 26px;cursor:pointer;border:1px solid var(--line);background:rgba(0,240,255,.04);color:var(--paper);transition:border-color .16s,box-shadow .16s,background .16s;-webkit-tap-highlight-color:transparent}
+.fb.y{border-color:var(--mag);color:var(--mag);box-shadow:0 0 20px rgba(255,46,136,.22)}
+.fb.y:hover{background:rgba(255,46,136,.12);box-shadow:0 0 34px rgba(255,46,136,.4)}
+.fb.n:hover{border-color:var(--cyan);color:var(--cyan)}
+.hub{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:12px;margin-top:26px}
+.hb{position:relative;text-align:left;border:1px solid var(--line);background:var(--surface);padding:20px 18px 18px;cursor:pointer;color:var(--paper);transition:border-color .16s,box-shadow .16s,transform .16s,background .16s;-webkit-tap-highlight-color:transparent}
+.hb::before{content:"";position:absolute;top:-1px;left:-1px;width:12px;height:12px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan);opacity:.5;transition:opacity .16s}
+.hb:hover{border-color:var(--cyan);background:rgba(0,240,255,.06);transform:translateY(-2px);box-shadow:0 0 30px rgba(0,240,255,.2)}
+.hb:hover::before{opacity:1}
+.hb:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.hb .hn{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--cyan);margin-bottom:11px}
+.hb .ht{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.2;margin-bottom:8px}
+.hb .hd{font-size:14.5px;color:var(--muted);line-height:1.5}
+.hb .hm{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted);margin-top:14px;padding-top:11px;border-top:1px solid var(--line-soft)}
+.hb .hm b{color:var(--cyan);font-weight:500}
+.hb.wide{grid-column:1/-1;border-color:rgba(255,46,136,.35);background:rgba(255,46,136,.05)}
+.hb.wide::before{border-color:var(--mag)}
+.hb.wide .hn,.hb.wide .hm b{color:var(--mag)}
+.hb.wide:hover{border-color:var(--mag);background:rgba(255,46,136,.11);box-shadow:0 0 34px rgba(255,46,136,.3)}
+.hb.on{border-color:var(--cyan);box-shadow:0 0 26px rgba(0,240,255,.22)}
+#home{display:none}
+.topbar .act.trk{color:var(--mag);text-shadow:0 0 12px rgba(255,46,136,.5)}
+.tgbtn{display:inline-flex;align-items:center;gap:10px;margin-top:22px;background:var(--mag);color:#06020D;text-decoration:none;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:16px 28px;box-shadow:0 0 26px rgba(255,46,136,.45);transition:box-shadow .16s,transform .16s;-webkit-tap-highlight-color:transparent}
+.tgbtn:hover{box-shadow:0 0 44px rgba(255,46,136,.75);transform:translateY(-1px)}
+.tgbtn.ghost{background:transparent;color:var(--cyan);border:1px solid var(--cyan);box-shadow:0 0 22px rgba(0,240,255,.18)}
+.tgbtn.ghost:hover{background:rgba(0,240,255,.09);box-shadow:0 0 36px rgba(0,240,255,.4)}
+.tgrow{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:8px}
+@media (max-width:820px){.tgbtn{width:100%;justify-content:center;padding:18px 20px}}
+.leave{margin-top:16px;background:none;border:none;color:rgba(126,135,174,.75);font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;padding:0;text-decoration:underline}
+.leave:hover{color:var(--mag)}
+
+/* ---------- demo 1: счётчик рутины ---------- */
+.rt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(236px,1fr));gap:10px;margin-top:4px}
+.rt-item{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:rgba(0,240,255,.02);padding:13px 14px;cursor:pointer;text-align:left;transition:border-color .16s,background .16s,box-shadow .16s;color:var(--paper)}
+.rt-item:hover{border-color:rgba(0,240,255,.5);background:rgba(0,240,255,.05)}
+.rt-item .bx{width:16px;height:16px;border:1px solid var(--line);flex:0 0 auto;position:relative}
+.rt-item.on{border-color:var(--cyan);background:rgba(0,240,255,.08);box-shadow:0 0 22px rgba(0,240,255,.16)}
+.rt-item.on .bx{border-color:var(--cyan);background:var(--cyan);box-shadow:0 0 12px rgba(0,240,255,.7)}
+.rt-item.on .bx::after{content:"✓";position:absolute;inset:0;color:#020108;font-size:12px;line-height:14px;text-align:center;font-weight:700}
+.rt-item .nm{font-size:15px;flex:1;line-height:1.35}
+.rt-item .hr{font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap}
+.rt-item.on .hr{color:var(--cyan)}
+.rt-out{margin-top:22px;border-top:1px solid var(--line-soft);padding-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:18px}
+.rt-out .metric b{color:var(--mag);text-shadow:0 0 24px rgba(255,46,136,.4)}
+.rt-note{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:18px;line-height:1.8}
+.rt-note b{color:var(--cyan);font-weight:500}
+
+/* ---------- demo 2: чат-бот ---------- */
+.chat-wrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:0}
+.chat{padding:clamp(16px,2.4vw,24px);border-right:1px solid var(--line);min-height:400px;display:flex;flex-direction:column}
+.bubbles{flex:1;display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
+.bub{max-width:86%;padding:12px 15px;font-size:15px;line-height:1.45;border:1px solid var(--line);background:var(--surface)}
+.bub.bot{align-self:flex-start;border-left:2px solid var(--cyan)}
+.bub.me{align-self:flex-end;border-right:2px solid var(--mag);background:rgba(255,46,136,.07);border-color:rgba(255,46,136,.3)}
+.bub .who{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.bub.bot .who{color:var(--cyan)}
+.bub.me .who{color:var(--mag)}
+.typing{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.14em}
+.quick{display:flex;flex-wrap:wrap;gap:9px;border-top:1px solid var(--line-soft);padding-top:16px}
+.qb{font-family:var(--body);font-size:14.5px;color:var(--paper);background:rgba(255,46,136,.05);border:1px solid rgba(255,46,136,.3);padding:11px 15px;cursor:pointer;transition:box-shadow .16s,background .16s,transform .16s}
+.qb:hover{background:rgba(255,46,136,.13);box-shadow:0 0 22px rgba(255,46,136,.3);transform:translateY(-1px)}
+.syspane{padding:clamp(16px,2.4vw,24px);background:rgba(0,240,255,.02)}
+.syspane .sh{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
+.sysline{font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--paper);padding:9px 0;border-bottom:1px solid var(--line-soft);animation:rise .3s ease}
+.sysline i{font-style:normal;color:var(--cyan);margin-right:8px}
+.sysline.m i{color:var(--mag)}
+.sysempty{font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.8}
+
+/* ---------- demo 3: сеть агентов ---------- */
+.pick{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+.pk-b{font-family:var(--body);font-size:14.5px;color:var(--paper);background:rgba(0,240,255,.03);border:1px solid var(--line);padding:12px 16px;cursor:pointer;transition:border-color .16s,box-shadow .16s,background .16s}
+.pk-b:hover{border-color:var(--cyan);background:rgba(0,240,255,.08);box-shadow:0 0 20px rgba(0,240,255,.2)}
+.pk-b.on{border-color:var(--mag);color:var(--mag);box-shadow:0 0 24px rgba(255,46,136,.25)}
+.agents{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:20px}
+.ag{border:1px solid var(--line);background:var(--surface);padding:14px 12px;opacity:.32;transition:opacity .3s,border-color .3s,box-shadow .3s,background .3s}
+.ag .an{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.ag .at{font-size:14.5px;font-weight:600;line-height:1.25}
+.ag .as{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:8px}
+.ag.run{opacity:1;border-color:var(--cyan);box-shadow:0 0 28px rgba(0,240,255,.25);background:var(--surface-2)}
+.ag.run .an{color:var(--cyan)}
+.ag.done{opacity:1;border-color:rgba(0,240,255,.35)}
+.ag.done .as{color:var(--cyan)}
+.aglog{font-family:var(--mono);font-size:12px;line-height:1.9;color:var(--muted);border-top:1px solid var(--line-soft);padding-top:16px;min-height:120px}
+.aglog div{animation:rise .3s ease}
+.aglog b{color:var(--cyan);font-weight:500}
+.aglog .fin{color:var(--mag)}
+
+/* ---------- demo 4: конструктор сценария ---------- */
+.chain{display:grid;gap:10px;margin-top:20px}
+.chain-step{display:flex;gap:16px;align-items:flex-start;border:1px solid var(--line);background:var(--surface);padding:14px 16px;animation:rise .35s ease backwards}
+.chain-step .n{font-family:var(--mono);font-size:11px;color:var(--cyan);flex:0 0 30px;padding-top:3px}
+.chain-step .ct{font-size:15.5px;font-weight:600;margin-bottom:4px}
+.chain-step .cd{font-size:14px;color:var(--muted);line-height:1.5}
+.chain-step.trig{border-color:var(--mag);background:rgba(255,46,136,.06)}
+.chain-step.trig .n{color:var(--mag)}
+.chain-empty{border:1px dashed var(--line);padding:26px 18px;color:var(--muted);font-family:var(--mono);font-size:12.5px;line-height:1.8;margin-top:20px}
+
+/* ---------- tree / timeline / diagram ---------- */
+.tree{display:grid;gap:11px;margin-top:24px}
+.br{border:1px solid var(--line);border-left:3px solid var(--cyan);background:var(--surface);padding:15px 18px}
+.br.b{border-left-color:var(--amber)}.br.c{border-left-color:var(--mag)}.br.d{border-left-color:var(--violet)}.br.e{border-left-color:rgba(126,135,174,.6)}
+.br .bh{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin-bottom:7px}
+.br.b .bh{color:var(--amber)}.br.c .bh{color:var(--mag)}.br.d .bh{color:var(--violet)}.br.e .bh{color:var(--muted)}
+.br .bh em{font-style:normal;color:var(--muted);letter-spacing:.08em}
+.br .bt{font-weight:600;font-size:15.5px;margin-bottom:5px}
+.br .bd{color:var(--muted);font-size:14.5px;line-height:1.55}
+.br.on{box-shadow:0 0 34px rgba(0,240,255,.18);background:var(--surface-2)}
+.tl{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));margin-top:24px;border:1px solid var(--line)}
+.tl>div{padding:16px 15px;border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
+.tl .d{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--cyan);margin-bottom:9px}
+.tl .t{font-size:14.5px;font-weight:600;margin-bottom:5px}
+.tl p{font-size:13.5px;color:var(--muted);line-height:1.5}
+.diagram{margin-top:22px;border:1px solid var(--line);background:rgba(2,1,8,.55);padding:16px clamp(10px,2vw,20px)}
+.diagram svg{width:100%;height:auto;display:block;overflow:visible}
+.diagram .nd rect{fill:var(--surface-2);stroke:var(--line);stroke-width:1}
+.diagram .nd rect.gate{stroke:var(--mag);fill:rgba(255,46,136,.10)}
+.diagram .ar line{stroke:var(--cyan);stroke-width:1.4;opacity:.75}
+.diagram .drop path{fill:none;stroke:rgba(126,135,174,.45);stroke-width:1.2;stroke-dasharray:4 5}
+.diagram .drop.out path{stroke:rgba(0,240,255,.45)}
+.diagram .bx{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.diagram .bx.b{stroke:var(--amber)}.diagram .bx.c{stroke:var(--mag)}.diagram .bx.d{stroke:var(--violet)}.diagram .bx.e{stroke:rgba(126,135,174,.55)}
+.diagram text{font-family:var(--mono);text-anchor:middle}
+.diagram .t1{font-size:14px;font-weight:700;fill:var(--paper);letter-spacing:.04em}
+.diagram .t1.g{fill:var(--mag)}.diagram .t1.cb{fill:var(--amber)}.diagram .t1.cc{fill:var(--mag)}
+.diagram .t1.cd{fill:var(--violet)}.diagram .t1.ce{fill:var(--muted)}
+.diagram .t2{font-size:12px;fill:var(--muted)}
+.diagram .t3{font-size:11px;fill:rgba(126,135,174,.85);letter-spacing:.06em}
+.diagram .t4{font-size:12.5px;fill:var(--muted);text-anchor:start;font-style:italic}
+
+/* ---------- layers map ---------- */
+.layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;margin-top:26px;border:1px solid var(--line)}
+.layer{padding:22px 20px;border-right:1px solid var(--line-soft)}
+.layer:last-child{border-right:none}
+.layer .ln{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);margin-bottom:12px}
+.layer.b .ln{color:var(--mag)}.layer.c .ln{color:var(--violet)}
+.layer h3{font-size:16px;margin-bottom:10px}
+.layer p{font-size:14.5px;color:var(--muted);line-height:1.55}
+.layer .w{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:14px;padding-top:12px;border-top:1px solid var(--line-soft)}
+.layer .w b{color:var(--paper);font-weight:500}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;right:clamp(16px,4vw,48px);bottom:calc(clamp(16px,3.5vh,34px) + env(safe-area-inset-bottom,0px));display:none;gap:10px;z-index:6}
+html.js .nav{display:flex}
+.nav button{width:54px;height:46px;border:1px solid var(--line);background:rgba(2,1,8,.92);color:var(--paper);cursor:pointer;font-size:18px;font-family:var(--mono);transition:border-color .16s,color .16s,box-shadow .16s;backdrop-filter:blur(6px);-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.nav button:hover:not(:disabled){border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 18px rgba(0,240,255,.3)}
+.nav button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.hint{position:fixed;left:clamp(20px,5vw,64px);bottom:clamp(18px,3.5vh,36px);z-index:5;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+html:not(.js) .counter,html:not(.js) .track,html:not(.js) .hint{display:none}
+
+@media (max-width:900px){
+  .chat-wrap{grid-template-columns:1fr}
+  .chat{border-right:none;border-bottom:1px solid var(--line);min-height:0}
+}
+@media (max-width:820px){
+  body{font-size:16px}
+  html.js,html.js body{height:auto}
+  html.js body{overflow:auto}
+  html.js .deck{display:block;height:auto}
+  html.js .stage{flex:none;overflow:visible}
+  .split,.vs,.layers{grid-template-columns:1fr}
+  .vs>div:first-child{border-right:none;border-bottom:1px solid var(--line)}
+  .layer{border-right:none;border-bottom:1px solid var(--line-soft)}
+  .hint{display:none}
+  .slide{padding:40px 16px}
+  html.js .slide{position:static;padding:18px 16px 100px}
+  html.js .slide.on{display:flex;flex-direction:column;min-height:100vh;min-height:100svh}
+  .topbar{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,rgba(2,1,8,.96) 70%,rgba(2,1,8,0));padding-top:calc(14px + env(safe-area-inset-top,0px));padding-bottom:10px;font-size:9px;letter-spacing:.1em;gap:10px;flex-wrap:nowrap}
+  .topbar .brand,.topbar .brand b{font-size:9px;white-space:nowrap}
+  .counter{white-space:nowrap}
+  .bg-grid{background-size:52px 52px}
+  .nav{gap:12px}
+  .nav button{width:60px;height:52px;font-size:20px}
+  .opt{padding:18px 16px;font-size:16px}
+  .kiosk{min-height:0}
+  .kiosk-titlebar{font-size:9px;letter-spacing:.06em}
+  .kiosk-titlebar .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .tag{flex:0 0 72px}
+  .diagram{padding:12px 8px}
+  .diagram .t1{font-size:17px}.diagram .t2{font-size:14px}.diagram .t3{font-size:13px}.diagram .t4{font-size:14px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-accent"></div>
+<div class="nojs">Презентация открыта в просмотрщике файлов — интерактив отключён.<br>Откройте её в браузере: слайды и пять демо заработают.</div>
+<div class="bg-scene" aria-hidden="true">
+<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+  <g class="sc-floor">
+    <path d="M-260,800 L620,410"/><path d="M-60,800 L620,410"/><path d="M140,800 L620,410"/>
+    <path d="M340,800 L620,410"/><path d="M520,800 L620,410"/><path d="M700,800 L620,410"/>
+    <path d="M900,800 L620,410"/><path d="M1100,800 L620,410"/><path d="M1300,800 L620,410"/>
+    <path d="M-200,800 H1400"/><path d="M-120,712 H1340"/><path d="M-40,646 H1280"/>
+    <path d="M40,596 H1220"/><path d="M110,556 H1160"/><path d="M170,524 H1110"/>
+    <path d="M220,498 H1060"/><path d="M265,477 H1020"/><path d="M300,460 H990"/>
+  </g>
+  <g class="sc-wall"><path d="M340,90 H1130 V460 H340 Z"/></g>
+
+  <g class="sc-desk">
+    <path d="M150,556 H520 L566,638 H104 Z"/><path d="M150,556 H520"/>
+    <path d="M196,638 V712 M520,638 V700"/>
+  </g>
+  <g class="sc-mon">
+    <rect class="case" x="238" y="392" width="252" height="158" rx="4"/>
+    <rect class="screen" x="250" y="404" width="228" height="134" rx="2"/>
+    <path class="ln" d="M266,430 H400" style="animation-delay:0s"/>
+    <path class="ln" d="M266,452 H442" style="animation-delay:.6s"/>
+    <path class="ln" d="M266,474 H372" style="animation-delay:1.2s"/>
+    <path class="ln" d="M266,496 H424" style="animation-delay:1.8s"/>
+    <path d="M350,550 V572 M310,572 H406" stroke="rgba(0,240,255,.3)"/>
+  </g>
+
+  <g class="sc-rack">
+    <rect class="box" x="846" y="268" width="196" height="312" rx="4"/>
+    <path class="u" d="M846,318 H1042 M846,368 H1042 M846,418 H1042 M846,468 H1042 M846,518 H1042"/>
+    <circle class="led" cx="1018" cy="294" r="4" style="animation-delay:0s"/>
+    <circle class="led" cx="1018" cy="344" r="4" style="animation-delay:.7s"/>
+    <circle class="led" cx="1018" cy="394" r="4" style="animation-delay:1.3s"/>
+    <circle class="led" cx="1018" cy="444" r="4" style="animation-delay:.4s"/>
+    <circle class="led" cx="1018" cy="494" r="4" style="animation-delay:1.9s"/>
+    <circle class="led" cx="1018" cy="544" r="4" style="animation-delay:1.1s"/>
+  </g>
+
+  <g class="sc-mesh">
+    <line x1="944" y1="268" x2="820" y2="176"/><line x1="944" y1="268" x2="700" y2="212"/>
+    <line x1="944" y1="268" x2="742" y2="330"/><line x1="820" y1="176" x2="700" y2="212"/>
+    <line x1="700" y1="212" x2="596" y2="290"/><line x1="742" y1="330" x2="596" y2="290"/>
+    <line x1="820" y1="176" x2="908" y2="128"/>
+    <circle cx="820" cy="176" r="4" style="animation-delay:0s"/>
+    <circle cx="700" cy="212" r="4" style="animation-delay:.8s"/>
+    <circle cx="742" cy="330" r="4" style="animation-delay:1.5s"/>
+    <circle cx="596" cy="290" r="4" style="animation-delay:2.1s"/>
+    <circle cx="908" cy="128" r="4" style="animation-delay:1.1s"/>
+  </g>
+
+  <g class="sc-flow">
+    <rect x="-4" y="-4" width="8" height="8" style="animation-delay:0s"/>
+    <rect x="-4" y="-4" width="8" height="8" style="animation-delay:-1.6s"/>
+    <rect x="-4" y="-4" width="8" height="8" style="animation-delay:-3.2s"/>
+    <rect x="-4" y="-4" width="8" height="8" style="animation-delay:-4.8s"/>
+  </g>
+
+  <g class="sc-queue">
+    <g style="animation-delay:0s"><rect x="-14" y="-10" width="28" height="20"/><path d="M-14,-10 L0,2 L14,-10"/></g>
+    <g style="animation-delay:-3.5s"><rect x="-14" y="-10" width="28" height="20"/><path d="M-14,-10 L0,2 L14,-10"/></g>
+    <g style="animation-delay:-7s"><rect x="-14" y="-10" width="28" height="20"/><path d="M-14,-10 L0,2 L14,-10"/></g>
+    <g style="animation-delay:-10.5s"><rect x="-14" y="-10" width="28" height="20"/><path d="M-14,-10 L0,2 L14,-10"/></g>
+  </g>
+</svg>
+</div>
+
+<div class="deck">
+  <div class="topbar">
+    <span class="brand">BRONYARUN <b>//</b> автоматизация</span>
+    <span class="act" id="act">ШОУРИЛ</span>
+    <span class="counter" id="counter">01 / 22</span>
+  </div>
+  <div class="track"><i id="track"></i></div>
+
+  <div class="stage" id="stage">
+
+    <!-- 1 -->
+    <section class="slide on" id="s1" data-id="title" data-act="ШОУРИЛ">
+      <div class="eyebrow">Живая презентация · всё внутри работает</div>
+      <h1>Всё, что вы делаете<br><span class="hl">за компьютером</span>,<br>можно передать системе<span class="cur">▮</span></h1>
+      <p class="lede">Это не слайды про автоматизацию. Это пять работающих демо: счётчик вашей рутины, автоворонка, чат-бот, сеть агентов и конструктор сценариев. Нажимайте — всё живое.</p>
+      <div class="chips">
+        <span class="chip">5 <b>живых демо</b></span>
+        <span class="chip">под любой бизнес</span>
+        <span class="chip">работает <b>24/7</b></span>
+        <span class="chip">запуск от <b>2 недель</b></span>
+      </div>
+    </section>
+
+
+    <!-- HUB -->
+    <section class="slide" id="hub" data-id="hub" data-act="ВЫБОР">
+      <div class="eyebrow">Пять веток · выберите свою</div>
+      <h2 style="margin-bottom:6px">Что у вас болит прямо сейчас?</h2>
+      <p class="lede" style="margin-top:12px;font-size:16px">Дальше пойдёт только то, что относится к вашей задаче — с работающими демо внутри. Вернуться к выбору можно в любой момент кнопкой ⌂.</p>
+      <div class="hub">
+        <button class="hb" type="button" data-track="A">
+          <div class="hn">Ветка 01</div>
+          <div class="ht">Мало заявок, лиды теряются</div>
+          <div class="hd">Люди приходят с рекламы и пропадают. Никто не понимает, кто из них готов покупать.</div>
+          <div class="hm">6 слайдов · <b>демо: автоворонка</b></div>
+        </button>
+        <button class="hb" type="button" data-track="B">
+          <div class="hn">Ветка 02</div>
+          <div class="ht">Не успеваем отвечать</div>
+          <div class="hd">Клиенты пишут ночью и в выходные, менеджеры тонут в переписках, часть вопросов повторяется десятый раз.</div>
+          <div class="hm">3 слайда · <b>демо: чат-бот</b></div>
+        </button>
+        <button class="hb" type="button" data-track="C">
+          <div class="hn">Ветка 03</div>
+          <div class="ht">Рутина съедает время</div>
+          <div class="hd">Таблицы, отчёты, документы, напоминания, перенос данных из одного места в другое.</div>
+          <div class="hm">3 слайда · <b>2 демо: счётчик и сценарии</b></div>
+        </button>
+        <button class="hb" type="button" data-track="D">
+          <div class="hn">Ветка 04</div>
+          <div class="ht">Хочу агентов и свой сервер</div>
+          <div class="hd">Не бот со сценарием, а система, которая делает работу сама и держит данные внутри компании.</div>
+          <div class="hm">4 слайда · <b>демо: сеть агентов</b></div>
+        </button>
+        <button class="hb wide" type="button" data-track="E">
+          <div class="hn">Полный шоурил</div>
+          <div class="ht">Покажите всё подряд</div>
+          <div class="hd">Все пять демо и вся механика целиком: воронка, бот, агенты, свой сервер, конструктор сценариев, внедрение и форматы работы.</div>
+          <div class="hm">21 слайд · <b>все 5 демо</b> · минут на десять</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- 2 -->
+    <section class="slide" id="s2" data-id="a-problem" data-act="01 · РУТИНА">
+      <div class="eyebrow">Точка отсчёта</div>
+      <div class="split">
+        <div>
+          <div class="big glitch" data-text="24/7">24/7</div>
+          <div class="big-note">клиенты пишут круглосуточно,<br>команда работает по графику</div>
+        </div>
+        <div>
+          <h2>Деньги теряются<br>не на стратегии</h2>
+          <div class="rows">
+            <div class="row"><span class="tag">ОТВЕТ</span><span class="txt">Написали в 22:40 — <b>ответили утром</b>. <span>За ночь человек нашёл того, кто ответил сразу.</span></span></div>
+            <div class="row"><span class="tag">ЗАЯВКИ</span><span class="txt">Директ, WhatsApp, почта, сайт. <span>Заявка живёт там, где её оставили, и там же теряется.</span></span></div>
+            <div class="row"><span class="tag">ПОВТОР</span><span class="txt">Менеджер <b>десятый раз за день</b> пишет один и тот же ответ про цену и сроки.</span></div>
+            <div class="row"><span class="tag">ПАМЯТЬ</span><span class="txt">Кто не купил — <span>забыт. Через месяц он покупает у другого, потому что тот напомнил.</span></span></div>
+            <div class="row"><span class="tag">ОТЧЁТ</span><span class="txt">Собрать цифры за неделю — <b>полдня руками</b> <span>вместо решений по этим цифрам.</span></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · ДЕМО 1 -->
+    <section class="slide" id="s3" data-id="c-count" data-act="01 · РУТИНА">
+      <div class="eyebrow">Демо 1 · отметьте то, что есть у вас</div>
+      <h2 style="margin-bottom:6px">Сколько часов съедает рутина</h2>
+      <div class="kiosk">
+        <div class="kiosk-titlebar"><span class="kd r"></span><span class="kd y"></span><span class="kd g"></span><span class="tt">Счётчик рутины</span><span class="score" id="rt-score">0 Ч / МЕС</span></div>
+        <div class="kiosk-body">
+          <div class="q-line">&gt; отметьте задачи, которые у вас делают руками</div>
+          <div class="rt-grid" id="rt-grid"></div>
+          <div class="rt-out" id="rt-out"></div>
+          <div class="rt-note" id="rt-note"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="slide" id="s4" data-id="t-layers" data-act="02 · КАРТА">
+      <div class="eyebrow">Три слоя</div>
+      <h2>Автоматизация делится на три слоя.<br>Их можно включать по одному</h2>
+      <div class="layers">
+        <div class="layer a">
+          <div class="ln">Слой 1 · до клиента</div>
+          <h3>Автоворонка</h3>
+          <p>Человек приходит с рекламы или соцсетей и сам доходит до заявки: получает пользу, отвечает на вопросы, оставляет контакт. Менеджер подключается к готовому.</p>
+          <div class="w">Закрывает: <b>привлечение и квалификацию</b></div>
+        </div>
+        <div class="layer b">
+          <div class="ln">Слой 2 · с клиентом</div>
+          <h3>Бот и ассистент</h3>
+          <p>Отвечает мгновенно и круглосуточно, знает ваш прайс и условия, записывает, напоминает, ведёт заказ. Сложное — передаёт человеку с полным контекстом.</p>
+          <div class="w">Закрывает: <b>обработку и сопровождение</b></div>
+        </div>
+        <div class="layer c">
+          <div class="ln">Слой 3 · внутри компании</div>
+          <h3>Агенты и сценарии</h3>
+          <p>Внутренняя работа: собрать данные, сделать отчёт, разобрать почту, подготовить документы, проверить и передать дальше. Без участия человека до момента решения.</p>
+          <div class="w">Закрывает: <b>операционную рутину</b></div>
+        </div>
+      </div>
+      <p class="lede">Дальше — каждый слой в виде живого демо. Начнём с первого.</p>
+    </section>
+
+    <!-- 5 -->
+    <section class="slide" id="s5" data-id="a-diagram" data-act="02 · ВОРОНКА">
+      <div class="eyebrow">Вся воронка на одном экране</div>
+      <h2 style="margin-bottom:4px">Как устроена автоворонка</h2>
+      <p class="lede" style="margin-top:10px;font-size:16px">Верхний ряд — путь клиента. Нижний — куда он попадает, если остановился. Пустых выходов нет: у каждого лида есть сценарий.</p>
+      <div class="diagram">
+        <svg viewBox="0 0 1000 430" role="img" aria-label="Схема автоворонки">
+          <defs><marker id="ah" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#00F0FF"/></marker></defs>
+          <g class="nd">
+            <rect x="8" y="46" width="168" height="72"/><rect x="204" y="46" width="168" height="72"/>
+            <rect x="400" y="46" width="168" height="72" class="gate"/><rect x="596" y="46" width="168" height="72"/>
+            <rect x="792" y="46" width="200" height="72"/>
+          </g>
+          <text class="t1" x="92" y="76">ТРАФИК</text><text class="t2" x="92" y="98">реклама · соцсети</text>
+          <text class="t1" x="288" y="76">ПОЛЬЗА</text><text class="t2" x="288" y="98">расчёт · подбор · разбор</text>
+          <text class="t1 g" x="484" y="76">🔒 КОНТАКТ</text><text class="t2" x="484" y="98">результат готов на 60%</text>
+          <text class="t1" x="680" y="76">ДОВОПРОСЫ</text><text class="t2" x="680" y="98">бюджет · срок · задача</text>
+          <text class="t1" x="892" y="76">РЕЗУЛЬТАТ</text><text class="t2" x="892" y="98">+ 2 развилки: да / нет</text>
+          <g class="ar">
+            <line x1="176" y1="82" x2="198" y2="82" marker-end="url(#ah)"/>
+            <line x1="372" y1="82" x2="394" y2="82" marker-end="url(#ah)"/>
+            <line x1="568" y1="82" x2="590" y2="82" marker-end="url(#ah)"/>
+            <line x1="764" y1="82" x2="786" y2="82" marker-end="url(#ah)"/>
+          </g>
+          <g class="drop"><path d="M288,118 L288,168 L92,168 L92,286"/><path d="M680,118 L680,196 L288,196 L288,286"/></g>
+          <text class="t3" x="130" y="160">ушёл до контакта</text>
+          <text class="t3" x="326" y="188">ушёл, контакт уже есть</text>
+          <g class="drop out"><path d="M892,118 L892,232 L484,232 L484,286"/><path d="M892,118 L892,232 L680,232 L680,286"/><path d="M892,118 L892,286"/></g>
+          <rect class="bx e" x="8" y="286" width="168" height="78"/><rect class="bx b" x="204" y="286" width="168" height="78"/>
+          <rect class="bx c" x="400" y="286" width="168" height="78"/><rect class="bx d" x="596" y="286" width="168" height="78"/>
+          <rect class="bx e" x="792" y="286" width="200" height="78"/>
+          <text class="t1 ce" x="92" y="316">A · РЕТАРГЕТ</text><text class="t2" x="92" y="338">контакта нет</text><text class="t2" x="92" y="354">догоняем рекламой</text>
+          <text class="t1 cb" x="288" y="316">B · ДОБОР</text><text class="t2" x="288" y="338">Д1 · Д3 · Д7 · Д14</text><text class="t2" x="288" y="354">дособираем ответы</text>
+          <text class="t1 cc" x="484" y="316">C · HOT</text><text class="t2" x="484" y="338">сказал «да»</text><text class="t2" x="484" y="354">алерт менеджеру</text>
+          <text class="t1 cd" x="680" y="316">D · WARM</text><text class="t2" x="680" y="338">догрев 30 дней</text><text class="t2" x="680" y="354">материалы по нише</text>
+          <text class="t1 ce" x="892" y="316">E · БАЗА</text><text class="t2" x="892" y="338">новости · офферы</text><text class="t2" x="892" y="354">вернулся → B или D</text>
+          <text class="t4" x="8" y="404">Обычный сайт работает только по одному пути: трафик → форма → тишина. Всё остальное на схеме у большинства просто не существует.</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 6 · ДЕМО 2 -->
+    <section class="slide" id="s6" data-id="a-demo" data-act="02 · ВОРОНКА">
+      <div class="eyebrow">Демо 2 · это не картинка, нажимайте</div>
+      <h2 style="margin-bottom:6px">Воронка, которая квалифицирует</h2>
+      <div class="kiosk" id="kiosk"></div>
+    </section>
+
+    <!-- 7 -->
+    <section class="slide" id="s7" data-id="a-collected" data-sync="collected" data-act="02 · ВОРОНКА">
+      <div class="eyebrow">Что сейчас произошло</div>
+      <h2>Вы отдали анкету,<br>не заполняя анкету</h2>
+      <div class="rows">
+        <div class="row"><span class="tag">01</span><span class="txt">Вы <b>не читали сайт</b> — <span>вас довели до одного вывода за семь шагов.</span></span></div>
+        <div class="row"><span class="tag">02</span><span class="txt">Контакт вы оставили <b>в середине</b>, <span>когда результат был почти готов, — а не на входе и не в конце.</span></span></div>
+        <div class="row"><span class="tag">03</span><span class="txt">Система знает <b>объём, задачу и срок</b>. <span>Прямых вопросов «какой у вас бюджет» не было.</span></span></div>
+        <div class="row"><span class="tag">04</span><span class="txt">Даже если вы закроете вкладку сейчас — <span>вы уже в одной из пяти веток догрева.</span></span></div>
+      </div>
+      <div class="collected" id="collected"></div>
+    </section>
+
+    <!-- 8 -->
+    <section class="slide" id="s8" data-id="a-lead" data-sync="lead" data-act="02 · ВОРОНКА">
+      <div class="eyebrow">Что видит менеджер</div>
+      <div class="split">
+        <div>
+          <h2>Карточка<br>вместо формы</h2>
+          <p class="lede" style="margin-top:18px">Горячий лид — мгновенное сообщение в Telegram с полной карточкой. Менеджер звонит, уже зная нишу, объём, задачу и срок.</p>
+          <p class="lede" style="font-size:14px">Если вы прошли демо — это ваша карточка, собранная из ваших ответов.</p>
+        </div>
+        <div class="lead">
+          <span class="l">ниша&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="v" id="ld-niche">—</span><br>
+          <span class="l">обращений</span><span class="v" id="ld-leads">—</span><br>
+          <span class="l">канал&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="v" id="ld-channel">—</span><br>
+          <span class="l">боль&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="v" id="ld-pain">—</span><br>
+          <span class="l">команда&nbsp;&nbsp;</span><span class="v" id="ld-team">—</span><br>
+          <span class="l">где&nbsp;заявки</span><span class="v" id="ld-stack">—</span><br>
+          <span class="l">срок&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="v" id="ld-term">—</span><br>
+          <span class="l">сборка&nbsp;&nbsp;&nbsp;</span><span class="v" id="ld-rec">—</span><br>
+          <span class="l">ветка&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="v" id="ld-branch">—</span><br>
+          <span class="l">скоринг&nbsp;&nbsp;</span><span class="score" id="ld-score">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 -->
+    <section class="slide" id="s9" data-id="a-branches" data-sync="branch" data-act="02 · ВОРОНКА">
+      <div class="eyebrow">Вариативность</div>
+      <h2>Пять веток. Ни один лид<br>не остаётся без сценария</h2>
+      <p class="lede" style="margin-top:14px">Ветка определяется точкой, в которой человек остановился, и ответами на две развилки в конце. Ваша ветка подсвечена.</p>
+      <div class="tree" id="tree">
+        <div class="br e" data-br="A"><div class="bh">Ветка A · ушёл до контакта <em>данных нет</em></div><div class="bt">Только ретаргетинг</div><div class="bd">Пиксель и предложение вернуться при следующем заходе: «досчитать за 30 секунд». Единственная ветка, где мы почти бессильны — поэтому контакт просят рано.</div></div>
+        <div class="br b" data-br="B"><div class="bh">Ветка B · контакт есть, ответов не хватает <em>самая частая</em></div><div class="bt">Добор недостающего</div><div class="bd">Д1: «остался один вопрос — пришлём результат целиком». Д3: разбор похожей задачи. Д7: предложение созвона. Д14 — переезд в базу.</div></div>
+        <div class="br c" data-br="C"><div class="bh">Ветка C · прошёл целиком и сказал «да» <em>HOT</em></div><div class="bt">Сообщение менеджеру за секунды</div><div class="bd">Звонок, пока человек ещё на странице. Д1 — напоминание, если не дозвонились. Д3 — материалы в Telegram. Дальше работают руки менеджера.</div></div>
+        <div class="br d" data-br="D"><div class="bh">Ветка D · «звонок не нужен, материалы — да» <em>WARM</em></div><div class="bt">Контентный догрев, 30 дней</div><div class="bd">Д1: разбор задачи его типа. Д3: три возражения, которые задают перед покупкой. Д14: приглашение посмотреть систему вживую. Д30: новое полезное действие.</div></div>
+        <div class="br e" data-br="E"><div class="bh">Ветка E · «нет» на обе развилки <em>COLD</em></div><div class="bt">База и редкие касания</div><div class="bd">Раз в 2–4 недели: новое в продукте, сезонные предложения, новые полезные материалы. Кликнул или снова открыл воронку — автоматически поднимается в B или D.</div></div>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section class="slide" id="s10" data-id="b-intro" data-act="03 · БОТ">
+      <div class="eyebrow">Слой 2 · с клиентом</div>
+      <h2>Чат-бот — это не «нажмите 1».<br>Это ваш менеджер без графика</h2>
+      <div class="cols">
+        <div class="card"><div class="k">Знает ваш бизнес</div><p>Внутри — <strong>ваш прайс, условия, сроки и ответы менеджеров</strong>. Отвечает так, как ответил бы человек, знающий продукт.</p></div>
+        <div class="card"><div class="k">Отвечает за секунды</div><p>В любое время. <strong>Ночью, в выходные, в час пик</strong> — когда у команды нет физической возможности.</p></div>
+        <div class="card"><div class="k">Делает, а не болтает</div><p>Записывает, бронирует, оформляет, проверяет статус заказа, <strong>ставит задачу менеджеру</strong> и напоминает клиенту.</p></div>
+        <div class="card"><div class="k">Знает свой предел</div><p>Сложное или нестандартное — <strong>передаёт человеку с полным контекстом</strong>, а не гоняет клиента по кругу.</p></div>
+      </div>
+      <p class="lede">Живёт в Telegram, WhatsApp, на сайте, в Instagram — или во всех сразу с одной общей базой знаний.</p>
+    </section>
+
+    <!-- 11 · ДЕМО 3 -->
+    <section class="slide" id="s11" data-id="b-demo" data-act="03 · БОТ">
+      <div class="eyebrow">Демо 3 · вы — клиент, справа видно систему</div>
+      <h2 style="margin-bottom:6px">Диалог и то, что происходит под ним</h2>
+      <div class="kiosk">
+        <div class="kiosk-titlebar"><span class="kd r"></span><span class="kd y"></span><span class="kd g"></span><span class="tt">Telegram · бот компании</span><span class="score">ONLINE 24/7</span></div>
+        <div class="chat-wrap">
+          <div class="chat">
+            <div class="bubbles" id="bubbles"></div>
+            <div class="quick" id="quick"></div>
+          </div>
+          <div class="syspane">
+            <div class="sh">Что происходит в системе</div>
+            <div id="syslog"><div class="sysempty">Пока тихо.<br>Начните диалог слева — здесь появятся действия, которые бот делает сам.</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section class="slide" id="s12" data-id="b-night" data-act="03 · БОТ">
+      <div class="eyebrow">Пока вы спали</div>
+      <h2>Что бот успевает<br>между 22:00 и 9:00</h2>
+      <div class="rows">
+        <div class="row"><span class="tag">23:10</span><span class="txt">Ответил на вопрос о цене и условиях — <span>человек не ушёл искать дальше.</span></span></div>
+        <div class="row"><span class="tag">00:40</span><span class="txt">Записал клиента на четверг, <b>занял слот в календаре</b> <span>и поставил напоминание.</span></span></div>
+        <div class="row"><span class="tag">02:15</span><span class="txt">Принял заявку, задал уточняющие вопросы, <b>создал сделку</b> <span>с готовой карточкой.</span></span></div>
+        <div class="row"><span class="tag">07:30</span><span class="txt">Отправил напоминания всем, у кого сегодня встреча или оплата.</span></div>
+        <div class="row"><span class="tag">09:00</span><span class="txt">Прислал вам сводку: <b>сколько обращений, откуда, кому звонить первым.</b></span></div>
+      </div>
+      <p class="lede">Утром команда начинает не с разбора переписок, а с готового списка задач.</p>
+    </section>
+
+    <!-- 13 -->
+    <section class="slide" id="s13" data-id="d-vs" data-act="04 · АГЕНТЫ">
+      <div class="eyebrow">Слой 3 · внутри компании</div>
+      <h2>Бот и агент —<br>разные вещи</h2>
+      <div class="vs">
+        <div>
+          <h3>Бот</h3>
+          <ul>
+            <li>Идёт по заданному сценарию</li>
+            <li>Отвечает на то, что предусмотрели</li>
+            <li>Шаг влево — упирается</li>
+            <li>Работает в одном канале</li>
+            <li>Нужен человек, чтобы решить</li>
+          </ul>
+          <p class="dim" style="margin-top:16px;font-size:14px">Отлично закрывает <b style="color:var(--paper)">повторяющееся</b>.</p>
+        </div>
+        <div>
+          <h3>Агент</h3>
+          <ul>
+            <li>Получает цель, а не сценарий</li>
+            <li>Сам решает, какие шаги сделать</li>
+            <li>Работает с файлами, почтой, таблицами, сайтами</li>
+            <li>Может позвать других агентов</li>
+            <li>Приходит к человеку с готовым результатом</li>
+          </ul>
+          <p class="dim" style="margin-top:16px;font-size:14px">Закрывает <b style="color:var(--cyan)">работу, а не реплику</b>.</p>
+        </div>
+      </div>
+      <p class="lede">На практике их совмещают: бот общается с клиентом, агенты делают работу за кулисами.</p>
+    </section>
+
+    <!-- 14 · ДЕМО 4 -->
+    <section class="slide" id="s14" data-id="d-demo" data-act="04 · АГЕНТЫ">
+      <div class="eyebrow">Демо 4 · поставьте задачу и смотрите</div>
+      <h2 style="margin-bottom:6px">Сеть агентов за работой</h2>
+      <div class="kiosk">
+        <div class="kiosk-titlebar"><span class="kd r"></span><span class="kd y"></span><span class="kd g"></span><span class="tt">Оркестратор задач</span><span class="score" id="ag-state">ОЖИДАНИЕ</span></div>
+        <div class="kiosk-body">
+          <div class="q-line">&gt; выберите задачу</div>
+          <div class="pick" id="ag-pick"></div>
+          <div class="agents" id="ag-nodes"></div>
+          <div class="aglog" id="ag-log"><div class="dim">Задача не поставлена. Выберите одну — агенты распределят её между собой сами.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 -->
+    <section class="slide" id="s15" data-id="d-server" data-act="04 · АГЕНТЫ">
+      <div class="eyebrow">Приватность</div>
+      <div class="split">
+        <div>
+          <h2>Свой сервер,<br>свой агент</h2>
+          <p class="lede" style="margin-top:18px">Система может стоять на вашем сервере. База клиентов, переписки, документы и цены не уезжают в чужие сервисы и не зависят от чьей-то подписки.</p>
+        </div>
+        <div>
+          <div class="card"><div class="k">Данные остаются у вас</div><p>Клиентская база, договоры, переписка — <strong>внутри вашего контура</strong>. Доступ вы раздаёте сами и в любой момент забираете.</p></div>
+          <div class="card" style="margin-top:16px"><div class="k">Никакой зависимости</div><p>Сервис поднял цены или закрылся — <strong>у вас всё продолжает работать</strong>. Система ваша, а не арендованная.</p></div>
+          <div class="card" style="margin-top:16px"><div class="k">Свой ассистент</div><p>Агент, обученный <strong>на ваших документах и регламентах</strong>: отвечает сотрудникам, готовит документы, ищет по архиву за секунды.</p></div>
+          <div class="card" style="margin-top:16px"><div class="k">Растёт вместе с вами</div><p>Новый процесс — <strong>новый сценарий или агент</strong>, а не новая подписка и не новый сотрудник.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 -->
+    <section class="slide" id="s16" data-id="d-people" data-act="04 · АГЕНТЫ">
+      <div class="eyebrow">Честно о людях</div>
+      <h2>Агент не заменяет человека.<br>Он забирает у него то,<br>ради чего людей не нанимают</h2>
+      <div class="vs">
+        <div>
+          <h3>Уходит к агентам</h3>
+          <ul>
+            <li>Одинаковые ответы на одинаковые вопросы</li>
+            <li>Перенос данных из письма в таблицу и в CRM</li>
+            <li>Сбор отчётов и сводок</li>
+            <li>Первичная обработка и сортировка заявок</li>
+            <li>Напоминания, подтверждения, статусы</li>
+            <li>Черновики писем, документов, счетов</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Остаётся людям</h3>
+          <ul>
+            <li>Сложные переговоры и удержание клиента</li>
+            <li>Нестандартные ситуации и исключения</li>
+            <li>Решения, где нужна ответственность</li>
+            <li>Отношения, доверие, репутация</li>
+            <li>Контроль качества и калибровка системы</li>
+          </ul>
+          <p class="dim" style="margin-top:16px;font-size:14px">Тот же отдел закрывает <b style="color:var(--cyan)">кратно больше</b> без найма.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 17 -->
+    <section class="slide" id="s17" data-id="c-catalog" data-act="05 · СЦЕНАРИИ">
+      <div class="eyebrow">Правило</div>
+      <h2>Если у действия есть повод<br>и понятный порядок —<br>его можно передать системе</h2>
+      <div class="rows">
+        <div class="row"><span class="tag">ПРОДАЖИ</span><span class="txt">Заявка → квалификация → CRM → задача менеджеру → напоминание, если не связались.</span></div>
+        <div class="row"><span class="tag">КЛИЕНТЫ</span><span class="txt">Запись, подтверждение, напоминание, отзыв после, повторная продажа через N дней.</span></div>
+        <div class="row"><span class="tag">ДОКУМЕНТЫ</span><span class="txt">Счета, договоры, акты по шаблону <span>— из данных сделки, без ручного заполнения.</span></span></div>
+        <div class="row"><span class="tag">ПОЧТА</span><span class="txt">Разбор входящих, сортировка по темам, черновики ответов <span>к вашему приходу.</span></span></div>
+        <div class="row"><span class="tag">ОТЧЁТЫ</span><span class="txt">Сводка по продажам, заявкам и менеджерам <span>каждое утро в Telegram.</span></span></div>
+        <div class="row"><span class="tag">ЗАКУПКИ</span><span class="txt">Мониторинг остатков, цен поставщиков, автоматические заявки на пополнение.</span></div>
+        <div class="row"><span class="tag">КОМАНДА</span><span class="txt">Онбординг новых, ответы на внутренние вопросы, контроль дедлайнов и регламентов.</span></div>
+        <div class="row"><span class="tag">СБОР&nbsp;ДАННЫХ</span><span class="txt">Списки компаний, контакты, мониторинг конкурентов и рынка <span>— на регулярной основе.</span></span></div>
+      </div>
+    </section>
+
+    <!-- 18 · ДЕМО 5 -->
+    <section class="slide" id="s18" data-id="c-hooks" data-act="05 · СЦЕНАРИИ">
+      <div class="eyebrow">Демо 5 · выберите повод — соберётся цепочка</div>
+      <h2 style="margin-bottom:6px">Конструктор сценария</h2>
+      <div class="kiosk">
+        <div class="kiosk-titlebar"><span class="kd r"></span><span class="kd y"></span><span class="kd g"></span><span class="tt">Сценарий · триггер → действия</span><span class="score" id="hk-state">ВЫБЕРИТЕ ПОВОД</span></div>
+        <div class="kiosk-body">
+          <div class="q-line">&gt; что происходит?</div>
+          <div class="pick" id="hk-pick"></div>
+          <div id="hk-out"><div class="chain-empty">Выберите событие сверху — система покажет, что она сделает дальше сама.<br>Любой шаг цепочки меняется под ваш процесс: это конструктор, а не готовая коробка.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 19 -->
+    <section class="slide" id="s19" data-id="t-change" data-act="06 · ВНЕДРЕНИЕ">
+      <div class="eyebrow">Что меняется</div>
+      <h2>Один и тот же поток обращений</h2>
+      <div class="vs">
+        <div>
+          <h3>Как сейчас</h3>
+          <ul>
+            <li>Ответ — когда менеджер освободился</li>
+            <li>Заявки живут в четырёх мессенджерах</li>
+            <li>Кто не купил — забыт</li>
+            <li>Половина дня уходит на рутину</li>
+            <li>Рост потока = найм людей</li>
+          </ul>
+          <p class="dim" style="margin-top:16px;font-size:14px">Второй попытки с клиентом обычно нет.</p>
+        </div>
+        <div>
+          <h3>С системой</h3>
+          <ul>
+            <li>Ответ — <b class="hl">за секунды и круглосуточно</b></li>
+            <li>Все заявки в одном месте, с историей</li>
+            <li>Каждый лид — <b class="hl">в своей ветке догрева</b></li>
+            <li>Рутина уходит агентам</li>
+            <li>Рост потока = <b class="hl">та же команда</b></li>
+          </ul>
+          <p class="dim" style="margin-top:16px;font-size:14px">База растёт и <b style="color:var(--cyan)">работает дальше сама</b>.</p>
+        </div>
+      </div>
+      <p class="lede" style="font-size:15px">Конкретные цифры считаются на ваших данных: сколько обращений, сколько теряется, сколько стоит час команды. До внедрения любые проценты — чужие, а не ваши.</p>
+    </section>
+
+    <!-- 20 -->
+    <section class="slide" id="s20" data-id="t-steps" data-act="06 · ВНЕДРЕНИЕ">
+      <div class="eyebrow">Как это происходит</div>
+      <h2>От разговора до работающей системы</h2>
+      <div class="tl">
+        <div><div class="d">ШАГ 1</div><div class="t">Разбор процессов</div><p>Созвон: где теряются деньги и время, что автоматизируем первым. Без этого — не начинаем.</p></div>
+        <div><div class="d">ШАГ 2</div><div class="t">Спецификация</div><p>Сценарии, тексты, точки интеграции, что система имеет право говорить клиенту.</p></div>
+        <div><div class="d">2 НЕДЕЛИ</div><div class="t">Рабочее ядро</div><p>Первый контур: бот или воронка, карточки лидов, уведомления. Уже можно пользоваться.</p></div>
+        <div><div class="d">+1–2 НЕД</div><div class="t">Обвязка</div><p>Ветки догрева, CRM, отчёты, агенты под внутренние задачи.</p></div>
+        <div><div class="d">ДАЛЬШЕ</div><div class="t">Калибровка</div><p>Смотрим на реальные диалоги и цифры, докручиваем сценарии и тексты.</p></div>
+      </div>
+      <p class="lede">Внедряется по частям и не останавливает работу компании. Первый результат виден до того, как система собрана целиком.</p>
+    </section>
+
+    <!-- 21 -->
+    <section class="slide" id="s21" data-id="t-tiers" data-act="06 · ВНЕДРЕНИЕ">
+      <div class="eyebrow">Форматы</div>
+      <h2>Три уровня входа</h2>
+      <div class="cols">
+        <div class="card"><div class="k">Точка</div><p><strong>Один процесс, который болит сильнее всего.</strong> Бот на приём заявок, напоминания, отчёты по утрам. Быстрый запуск, понятный эффект, минимальный риск.</p></div>
+        <div class="card"><div class="k">Контур</div><p><strong>Полный путь клиента.</strong> Воронка + бот + CRM + догрев + аналитика. Обращение не теряется ни на одном этапе.</p></div>
+        <div class="card"><div class="k">Система</div><p><strong>Клиенты и внутренняя работа целиком.</strong> Свой сервер, свои агенты, документы, отчёты, база знаний компании. Инфраструктура, а не отдельный инструмент.</p></div>
+      </div>
+      <p class="lede">Начинать почти всегда стоит с «точки»: один работающий процесс убеждает лучше любой презентации — включая эту.</p>
+    </section>
+
+    <!-- 22 -->
+    <section class="slide" id="s22" data-id="t-final" data-act="06 · ВНЕДРЕНИЕ">
+      <div class="eyebrow">Следующий шаг</div>
+      <h2>Что нужно, чтобы начать</h2>
+      <div class="rows">
+        <div class="row"><span class="tag">1</span><span class="txt"><b>Созвон 40 минут.</b> <span>Разбираем ваши процессы и находим, где система даст эффект быстрее всего.</span></span></div>
+        <div class="row"><span class="tag">2</span><span class="txt"><b>Короткий список.</b> <span>Топ-20 вопросов клиентов, ваш прайс или вилки, регламент — кто что делает после заявки.</span></span></div>
+        <div class="row"><span class="tag">3</span><span class="txt"><b>Две недели.</b> <span>Собираю рабочее ядро на тестовом контуре — с вашими текстами и вашими данными.</span></span></div>
+        <div class="row"><span class="tag">4</span><span class="txt"><b>Решение вы принимаете, увидев рабочую версию,</b> <span>а не по этим слайдам.</span></span></div>
+      </div>
+      <p class="lede">Вы уже пять раз нажали на демо внутри презентации. Ровно так же это будет чувствовать ваш клиент — только с вашим продуктом внутри.</p>
+      <div class="tgrow">
+        <a class="tgbtn" id="tg-final" href="#" target="_blank" rel="noopener">✈ Написать в Telegram</a>
+        <button class="tgbtn ghost" type="button" id="back-hub">⌂ Посмотреть другую ветку</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="hint">← → или пробел</div>
+<div class="nav">
+  <button id="home" aria-label="К выбору веток">⌂</button>
+  <button id="prev" aria-label="Назад">←</button>
+  <button id="next" aria-label="Вперёд">→</button>
+</div>
+<script>
+(function(){
+  /* ================= deck · маршруты ================= */
+  var els={};
+  [].slice.call(document.querySelectorAll('.slide')).forEach(function(el){ els[el.getAttribute('data-id')]=el });
+  var tracks={
+    A:{name:'01 · ЗАЯВКИ',   ids:['a-problem','a-diagram','a-demo','a-collected','a-lead','a-branches','t-steps','t-final']},
+    B:{name:'02 · ОТВЕТЫ',   ids:['b-intro','b-demo','b-night','t-steps','t-final']},
+    C:{name:'03 · РУТИНА',   ids:['c-count','c-catalog','c-hooks','t-steps','t-final']},
+    D:{name:'04 · АГЕНТЫ',   ids:['d-vs','d-demo','d-server','d-people','t-steps','t-final']},
+    E:{name:'ПОЛНЫЙ ШОУРИЛ', ids:['t-layers','a-problem','c-count','a-diagram','a-demo','a-collected','a-lead',
+        'a-branches','b-intro','b-demo','b-night','d-vs','d-demo','d-server','d-people','c-catalog','c-hooks',
+        't-change','t-steps','t-tiers','t-final']}
+  };
+  var base=['title','hub'], route=base.slice(), i=0, curTrack=null;
+  var counter=document.getElementById('counter'), track=document.getElementById('track');
+  var prev=document.getElementById('prev'), next=document.getElementById('next'), home=document.getElementById('home');
+  var stage=document.getElementById('stage'), actEl=document.getElementById('act');
+  function pad(n){return n<10?'0'+n:''+n}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function setRoute(k){ curTrack=k; route=base.concat(tracks[k].ids); markHub() }
+  function markHub(){
+    [].slice.call(document.querySelectorAll('.hb')).forEach(function(b){
+      b.classList.toggle('on', b.getAttribute('data-track')===curTrack);
+    });
+  }
+  function show(n){
+    i=Math.max(0,Math.min(route.length-1,n));
+    var id=route[i];
+    for(var k in els){ els[k].classList.toggle('on', k===id) }
+    if(!curTrack){ counter.textContent=pad(i+1)+' / —'; track.style.width=(i===0?'5%':'11%') }
+    else{ counter.textContent=pad(i+1)+' / '+pad(route.length); track.style.width=((i+1)/route.length*100)+'%' }
+    stage.scrollTop=0; window.scrollTo(0,0);
+    document.body.classList.toggle('hero',i===0);
+    document.documentElement.style.setProperty('--acc',(186+i*13)%360);
+    var inTrack=curTrack&&i>1;
+    if(actEl){
+      actEl.textContent=inTrack?tracks[curTrack].name:(els[id].getAttribute('data-act')||'ШОУРИЛ');
+      actEl.classList.toggle('trk',!!inTrack);
+    }
+    home.style.display=(i>1)?'block':'none';
+    var sync=els[id].getAttribute('data-sync');
+    if(sync==='collected')syncCollected();
+    if(sync==='lead')syncLead();
+    if(sync==='branch')syncBranch();
+    try{history.replaceState(null,'','#'+id)}catch(err){}
+  }
+  function goNext(){
+    if(i===1&&route.length===base.length){ setRoute('E'); show(2); return }
+    show(i+1);
+  }
+  prev.addEventListener('click',function(){show(i-1)});
+  next.addEventListener('click',goNext);
+  home.addEventListener('click',function(){show(1)});
+  [].slice.call(document.querySelectorAll('.hb')).forEach(function(b){
+    b.addEventListener('click',function(){ setRoute(b.getAttribute('data-track')); show(2) });
+  });
+  var bh=document.getElementById('back-hub');
+  if(bh)bh.addEventListener('click',function(){show(1)});
+  document.addEventListener('keydown',function(e){
+    var t=e.target, cl=t&&t.classList;
+    if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'))return;
+    if(cl&&(cl.contains('opt')||cl.contains('fb')||cl.contains('qb')||cl.contains('pk-b')||cl.contains('rt-item')||cl.contains('hb')))return;
+    if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();goNext()}
+    if(e.key==='ArrowLeft'){show(i-1)}
+    if(e.key==='Escape'&&i>1){show(1)}
+  });
+  var tx=0,ty=0;
+  document.addEventListener('touchstart',function(e){
+    if(e.target.closest('.kiosk'))return;
+    tx=e.changedTouches[0].clientX; ty=e.changedTouches[0].clientY;
+  },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(e.target.closest('.kiosk')||e.target.closest('.nav')||e.target.closest('.hb'))return;
+    var dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.4){ if(dx<0)goNext(); else show(i-1) }
+  },{passive:true});
+
+  /* ================= ДЕМО 1 · счётчик рутины ================= */
+  var tasks=[
+    {t:'Отвечаем на одни и те же вопросы',h:6},
+    {t:'Переносим заявки в таблицы и CRM',h:4},
+    {t:'Напоминаем о встречах и оплатах',h:3},
+    {t:'Собираем отчёты и сводки',h:4},
+    {t:'Отвечаем в нерабочее время',h:3},
+    {t:'Готовим счета и документы',h:3},
+    {t:'Разбираем входящую почту',h:5},
+    {t:'Собираем отзывы и ведём после сделки',h:2},
+    {t:'Ищем контакты и данные вручную',h:4},
+    {t:'Дублируем данные между сервисами',h:3}
+  ];
+  var picked={};
+  var rtGrid=document.getElementById('rt-grid'), rtOut=document.getElementById('rt-out'),
+      rtNote=document.getElementById('rt-note'), rtScore=document.getElementById('rt-score');
+  function rtRender(){
+    rtGrid.innerHTML='';
+    tasks.forEach(function(t,k){
+      var b=document.createElement('button');
+      b.type='button'; b.className='rt-item'+(picked[k]?' on':'');
+      b.innerHTML='<span class="bx"></span><span class="nm">'+esc(t.t)+'</span><span class="hr">'+t.h+' ч/нед</span>';
+      b.onclick=function(){ picked[k]=!picked[k]; rtRender(); };
+      rtGrid.appendChild(b);
+    });
+    var w=0,n=0;
+    tasks.forEach(function(t,k){if(picked[k]){w+=t.h;n++}});
+    var m=Math.round(w*4.3), d=Math.round(m/8*10)/10;
+    rtScore.textContent=m+' Ч / МЕС';
+    if(!n){
+      rtOut.innerHTML='<div class="metric"><b>0</b><span>задач<br>отмечено</span></div>';
+      rtNote.innerHTML='Отметьте то, что делают руками у вас — считать будем по вашим задачам, а не по средним по рынку.';
+      return;
+    }
+    rtOut.innerHTML=
+      '<div class="metric"><b>'+w+'</b><span>часов<br>в неделю</span></div>'+
+      '<div class="metric"><b>'+m+'</b><span>часов<br>в месяц</span></div>'+
+      '<div class="metric"><b>'+d+'</b><span>полных рабочих<br>дней в месяц</span></div>'+
+      '<div class="metric"><b>'+n+'</b><span>процессов<br>под автоматизацию</span></div>';
+    rtNote.innerHTML='<b>'+d+' рабочих дней в месяц</b> уходит на действия, у которых есть чёткий повод и понятный порядок. Это ровно то, что забирает система.<br>'+
+      'Часы здесь — усреднённые ориентиры. На разборе мы подставим ваши: сколько людей, сколько обращений, сколько стоит час.';
+  }
+  rtRender();
+
+  /* ================= ДЕМО 2 · автоворонка ================= */
+  var kiosk=document.getElementById('kiosk');
+  var state={}, score=0, logs=[], typer=null, branch=null, GATE=4;
+  var steps=[
+    {key:'niche',  label:'ниша',      q:'Чем занимается ваш бизнес?',        opts:['Услуги / студия','Товары / магазин','B2B / опт','Онлайн-продукт']},
+    {key:'leads',  label:'обращений', q:'Сколько обращений в месяц?',        opts:['до 30 в месяц','30–150','150+']},
+    {key:'channel',label:'канал',     q:'Откуда приходят люди?',             opts:['Соцсети','Реклама и сайт','Рекомендации','Холодные продажи']},
+    {key:'pain',   label:'боль',      q:'Что болит сильнее всего?',          dyn:true},
+    {key:'team',   label:'команда',   q:'Кто обрабатывает обращения?',       opts:['Я сам','1–3 менеджера','Отдел 4+']},
+    {key:'stack',  label:'где заявки',q:'Где сейчас живут заявки?',          opts:['Всё в переписках','Таблицы','CRM есть']},
+    {key:'term',   label:'срок',      q:'Когда хотите запустить?',           opts:['В этом месяце','В этом квартале','Пока смотрю']}
+  ];
+  var pains={
+    'Услуги / студия':['Не успеваем отвечать','Записи срываются','Заявки теряются в переписках','Клиенты не возвращаются'],
+    'Товары / магазин':['Одни и те же вопросы','Долгая обработка заказов','Брошенные корзины','Нет повторных продаж'],
+    'B2B / опт':['Долгая квалификация','Менеджеры тонут в рутине','Лиды остывают','Нет системы догрева'],
+    'Онлайн-продукт':['Мало доходят до покупки','Нет прогрева','Поддержка съедает время','Отвал после первого касания']
+  };
+  var pts={
+    niche:{'*':5},
+    leads:{'до 30 в месяц':8,'30–150':16,'150+':22},
+    channel:{'*':6},
+    pain:{'*':7},
+    team:{'Я сам':10,'1–3 менеджера':14,'Отдел 4+':18},
+    stack:{'Всё в переписках':12,'Таблицы':10,'CRM есть':8},
+    term:{'В этом месяце':25,'В этом квартале':15,'Пока смотрю':3}
+  };
+  var rec={
+    'Услуги / студия':{
+      'Не успеваем отвечать':['Бот-администратор с записью','Мгновенный ответ и запись в календарь без менеджера — в том числе ночью и в выходные.'],
+      'Записи срываются':['Подтверждения и цепочка напоминаний','Подтверждение записи, напоминание перед визитом, перенос в один клик вместо неявки.'],
+      'Заявки теряются в переписках':['Единое окно заявок + CRM','Директ, WhatsApp, сайт и почта падают в одно место: у каждой заявки статус и ответственный.'],
+      'Клиенты не возвращаются':['Сценарии повторных продаж','Отзыв после визита, напоминание о повторе через нужное число дней, реактивация старой базы.']
+    },
+    'Товары / магазин':{
+      'Одни и те же вопросы':['Бот на вашей базе знаний','Наличие, доставка, оплата, возврат — отвечает мгновенно и одинаково точно каждому.'],
+      'Долгая обработка заказов':['Автообработка заказов','Заказ → подтверждение → задача на склад → трек клиенту. Ручные шаги исчезают.'],
+      'Брошенные корзины':['Возврат брошенных корзин','Напоминание в мессенджере, ответ на возражение, персональное предложение вместо тишины.'],
+      'Нет повторных продаж':['Сценарии возврата покупателя','Сегменты по покупкам, напоминание о расходниках, подборки под историю заказов.']
+    },
+    'B2B / опт':{
+      'Долгая квалификация':['Воронка с тихой квалификацией','Клиент сам отвечает на семь вопросов, менеджер получает готовую карточку вместо «расскажите, что вам нужно».'],
+      'Менеджеры тонут в рутине':['Агенты на операционные задачи','Коммерческие, счета, обновление CRM и отчёты уходят из рук менеджеров к агентам.'],
+      'Лиды остывают':['Ветки догрева и мгновенные алерты','Каждый лид в своём сценарии, горячий — менеджеру за секунды, пока интерес живой.'],
+      'Нет системы догрева':['Контентная цепочка + база','Материалы под нишу, регулярные касания, автоподъём лида при любой активности.']
+    },
+    'Онлайн-продукт':{
+      'Мало доходят до покупки':['Автоворонка с полезным действием','Человек получает пользу до оплаты и доходит до покупки сам, без давления менеджера.'],
+      'Нет прогрева':['Прогревающая цепочка','Серия касаний: разбор задачи, работа с возражениями, демонстрация результата.'],
+      'Поддержка съедает время':['Бот поддержки на вашей базе','Типовые вопросы закрывает бот, человек подключается только к нестандартному.'],
+      'Отвал после первого касания':['Возвратные сценарии','Триггеры на неактивность, возврат ровно на брошенный шаг, реактивация через месяц.']
+    }
+  };
+  var leadsN={'до 30 в месяц':25,'30–150':90,'150+':220};
+  var teamN={'Я сам':1,'1–3 менеджера':2,'Отдел 4+':4};
+  function calc(){
+    var L=leadsN[state.leads]||25, T=teamN[state.team]||1;
+    var scen=4+(L>=200?4:(L>=90?2:0))+(T>=4?2:(T>=2?1:0));
+    var auto=45;
+    if(state.stack==='Всё в переписках')auto+=12;
+    if(state.stack==='Таблицы')auto+=6;
+    if(L>=200)auto+=8;
+    if(state.channel==='Холодные продажи')auto-=6;
+    auto=Math.max(35,Math.min(75,auto));
+    var w1=2+(scen>8?1:0), w2=w1+2;
+    return {scen:scen,auto:auto,w1:w1,w2:w2,saved:Math.round(L*auto/100)};
+  }
+  function pad3(n){n=''+n;while(n.length<3)n='0'+n;return n}
+  function bar(pct){var f=Math.round(pct*14),s='';for(var k=0;k<14;k++)s+=k<f?'█':'<span class="e">░</span>';return s}
+  function typewrite(el,text){
+    if(typer)clearInterval(typer);
+    var j=0; el.textContent='';
+    typer=setInterval(function(){j++;el.textContent=text.slice(0,j);if(j>=text.length){clearInterval(typer);typer=null}},20);
+  }
+  function titlebar(t){
+    return '<div class="kiosk-titlebar"><span class="kd r"></span><span class="kd y"></span><span class="kd g"></span>'+
+      '<span class="tt">'+(t||'Подбор автоматизации')+'</span>'+
+      '<span class="score">SCORE '+pad3(Math.min(100,score))+'</span></div>';
+  }
+  function logHtml(){
+    if(!logs.length)return '';
+    var h='<div class="log">';
+    logs.forEach(function(l){h+='<div><span class="ok">[OK]</span> '+esc(l)+'</div>'});
+    return h+'</div>';
+  }
+  function bindLeave(){
+    var b=document.getElementById('leave');
+    if(b)b.onclick=function(){renderAbandon()};
+  }
+  function renderStep(n){
+    var s=steps[n];
+    var opts=s.dyn?(pains[state.niche]||[]):s.opts;
+    var pct=n/steps.length;
+    kiosk.innerHTML=titlebar()+
+      '<div class="kiosk-body">'+
+      '<div class="q-line">&gt; шаг '+(n+1)+'/'+steps.length+(n>=GATE?' · контакт получен':'')+'</div>'+
+      '<div class="ascii-bar">'+bar(pct)+' '+Math.round(pct*100)+'%</div>'+
+      '<div class="q" id="kq"></div><div class="opts"></div>'+
+      (n>=GATE?'<button class="leave" type="button" id="leave">✕ а если я сейчас закрою вкладку?</button>':'')+
+      logHtml()+'</div>';
+    typewrite(document.getElementById('kq'),s.q);
+    var box=kiosk.querySelector('.opts');
+    opts.forEach(function(o){
+      var b=document.createElement('button');
+      b.className='opt'; b.type='button'; b.textContent=o;
+      b.onclick=function(){
+        state[s.key]=o;
+        var pp=pts[s.key]; score+=(pp[o]!==undefined?pp[o]:pp['*']);
+        logs.push(s.label+' → '+o);
+        if(n+1===GATE&&!state.contact){renderGate()}
+        else if(n<steps.length-1){renderStep(n+1)}
+        else{renderResult()}
+      };
+      box.appendChild(b);
+    });
+    bindLeave();
+  }
+  function renderGate(){
+    var c=calc();
+    kiosk.innerHTML=titlebar()+
+      '<div class="kiosk-body">'+
+      '<div class="gate">🔒 шаг 4/7 · подбор готов на 60%</div>'+
+      '<div class="q" id="kq"></div>'+
+      '<div class="prize locked" aria-hidden="true">'+
+        '<div class="pk">Схема автоматизации · превью</div>'+
+        '<div class="pt">Сборка под ваш бизнес</div>'+
+        '<div class="metrics">'+
+          '<div class="metric"><b>'+c.scen+'</b><span>сценариев</span></div>'+
+          '<div class="metric"><b>'+c.auto+'%</b><span>обращений<br>без менеджера</span></div>'+
+          '<div class="metric"><b>'+c.w1+'–'+c.w2+'</b><span>недель<br>до запуска</span></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="fld" style="margin-top:20px"><label>Имя</label><input class="tin" id="cap-name" type="text" placeholder="Как к вам обращаться"></div>'+
+      '<div class="fld"><label>Телефон или Telegram</label><input class="tin" id="cap-contact" type="text" placeholder="+· · · или @username"></div>'+
+      '<button class="cta-btn" id="cap-go" type="button">Открыть подбор →</button>'+
+      '<div class="cap-note">Демо: данные никуда не отправляются и нигде не сохраняются. В рабочей версии карточка летит менеджеру в Telegram за секунды, а клиенту уходит результат.</div>'+
+      logHtml()+'</div>';
+    typewrite(document.getElementById('kq'),'Куда прислать вашу схему автоматизации?');
+    document.getElementById('cap-go').onclick=function(){
+      var nm=document.getElementById('cap-name').value.trim();
+      var ct=document.getElementById('cap-contact').value.trim();
+      if(!nm&&!ct){document.getElementById('cap-contact').focus();return}
+      state.contact=nm+(ct?' · '+ct:'');
+      logs.push('контакт → получен');
+      renderStep(GATE);
+    };
+  }
+  function renderAbandon(){
+    branch='B'; score=Math.min(100,score);
+    kiosk.innerHTML=titlebar('Сессия прервана')+
+      '<div class="kiosk-body"><div class="result">'+
+      '<div class="q-line">&gt; лид не потерян //</div>'+
+      '<span class="status warm">ВЕТКА B · брошенная квалификация</span>'+
+      '<div class="rt">Контакт у нас. Ответов не хватает.</div>'+
+      '<div class="rd">Это не потеря, а отдельный сценарий. Ровно ради него контакт просят на четвёртом шаге, а не на седьмом.</div>'+
+      '<div class="magnet"><b>Что запускается автоматически:</b><br>Д1 — «остался один вопрос, пришлём подбор целиком», возврат на брошенный шаг.<br>Д3 — разбор задачи вашего типа.<br>Д7 — предложение созвона.<br>Д14 — переезд в базу с редкими касаниями.</div>'+
+      '<button class="restart" type="button">↺ вернуться и досчитать</button>'+
+      '</div></div>';
+    kiosk.querySelector('.restart').onclick=function(){renderStep(GATE)};
+    syncAll();
+  }
+  function statusOf(s){ if(s>=70)return['HOT','hot']; if(s>=40)return['WARM','warm']; return['COLD','cold'] }
+  var brLabel={C:['HOT','hot'],D:['WARM','warm'],E:['COLD','cold'],B:['WARM','warm'],A:['COLD','cold']};
+  function renderResult(){
+    var r=(rec[state.niche]&&rec[state.niche][state.pain])||['Комбинированная сборка','Сценарий под вашу задачу.'];
+    var c=calc(), sc=Math.min(100,score), st=statusOf(sc);
+    kiosk.innerHTML=titlebar()+
+      '<div class="kiosk-body"><div class="result">'+
+      '<div class="q-line">&gt; подбор готов //</div>'+
+      '<span class="status '+st[1]+'">'+st[0]+' · '+sc+'/100</span>'+
+      '<div class="scorebar"><i style="width:0%"></i></div>'+
+      '<div class="prize">'+
+        '<div class="pk">Ваша сборка · '+esc(state.leads||'')+' · '+esc((state.team||'').toLowerCase())+'</div>'+
+        '<div class="pt">'+esc(r[0])+'</div>'+
+        '<div class="metrics">'+
+          '<div class="metric"><b>'+c.scen+'</b><span>сценариев</span></div>'+
+          '<div class="metric"><b>'+c.auto+'%</b><span>обращений<br>без менеджера</span></div>'+
+          '<div class="metric"><b>'+c.w1+'–'+c.w2+'</b><span>недель<br>до запуска</span></div>'+
+        '</div>'+
+        '<div class="rd" style="font-size:14.5px">'+esc(r[1])+'</div>'+
+      '</div>'+
+      '<div class="cap-note">Цифры в демо считает учебная модель по вашим ответам. Реальные — после разбора ваших процессов: на ваших обращениях, вашей команде и вашем прайсе.</div>'+
+      '<div class="forkq" id="fq">Разобрать вашу воронку вместе на созвоне?</div>'+
+      '<div class="forkbtns">'+
+        '<button class="fb y" type="button" data-a="yes">Да, давайте</button>'+
+        '<button class="fb n" type="button" data-a="no">Пока не нужно</button>'+
+      '</div>'+
+      '</div></div>';
+    setTimeout(function(){var b=kiosk.querySelector('.scorebar i');if(b)b.style.width=sc+'%'},60);
+    kiosk.querySelectorAll('.fb').forEach(function(b){
+      b.onclick=function(){
+        if(b.getAttribute('data-a')==='yes'){ logs.push('развилка 1 → да'); finish('C') }
+        else { logs.push('развилка 1 → нет'); fork2() }
+      };
+    });
+  }
+  function fork2(){
+    kiosk.querySelector('#fq').textContent='Хорошо. Прислать разбор похожей задачи — что собирали и что изменилось?';
+    var f=kiosk.querySelector('.forkbtns');
+    f.innerHTML='<button class="fb y" type="button" data-a="yes">Да, интересно</button>'+
+                '<button class="fb n" type="button" data-a="no">Нет, спасибо</button>';
+    f.querySelectorAll('.fb').forEach(function(b){
+      b.onclick=function(){
+        if(b.getAttribute('data-a')==='yes'){ logs.push('развилка 2 → да'); finish('D') }
+        else { logs.push('развилка 2 → нет'); finish('E') }
+      };
+    });
+  }
+  var brInfo={
+    C:['hot','ВЕТКА C · HOT','Сообщение менеджеру уже ушло','Звонок, пока вы ещё на странице. Д1 — напоминание, если не дозвонились. Д3 — материалы в Telegram. Дальше работают руки менеджера, а не автоматика.'],
+    D:['warm','ВЕТКА D · WARM','Контентный догрев, 30 дней','Д1 — разбор задачи вашего типа. Д3 — три возражения, которые задают перед стартом. Д14 — приглашение посмотреть систему вживую. Д30 — новое полезное действие.'],
+    E:['cold','ВЕТКА E · COLD','База и редкие касания','Раз в 2–4 недели: новое в продукте, сезонные предложения, новые материалы. Откроете воронку снова — автоматически поднимаетесь в ветку B или D.']
+  };
+  function finish(b){
+    branch=b;
+    var info=brInfo[b], sc=Math.min(100,score);
+    kiosk.innerHTML=titlebar('Маршрут определён')+
+      '<div class="kiosk-body"><div class="result">'+
+      '<div class="q-line">&gt; лид маршрутизирован //</div>'+
+      '<span class="status '+info[0]+'">'+info[1]+' · скоринг '+sc+'/100</span>'+
+      '<div class="rt">'+info[2]+'</div>'+
+      '<div class="rd">'+info[3]+'</div>'+
+      '<div class="magnet"><b>Карточка со скорингом '+sc+'/100 и ветка '+b+' уже в CRM</b> — вместе с контактом, нишей, объёмом и сроком. Разговор начинается с вашей задачи, а не с «расскажите, что вам нужно».</div>'+
+      '<div class="tgrow"><a class="tgbtn" href="'+tgLink(b)+'" target="_blank" rel="noopener">✈ Обсудить это со мной</a></div>'+
+      '<button class="restart" type="button">↺ пройти заново</button>'+
+      '</div></div>';
+    kiosk.querySelector('.restart').onclick=reset;
+    syncAll();
+  }
+  function reset(){state={};score=0;logs=[];branch=null;renderStep(0);syncAll()}
+
+  var collected=document.getElementById('collected');
+  function syncCollected(){
+    if(!collected)return;
+    var keys=[['niche','ниша'],['leads','обращений'],['channel','канал'],['pain','боль'],['team','команда'],['stack','где заявки'],['term','срок']];
+    var has=keys.some(function(k){return state[k[0]]});
+    var h='<span class="ck">Собрано без анкеты:</span>';
+    if(!has){ h+='<span class="cchip dim">пройдите демо — данные появятся здесь</span>' }
+    else{
+      keys.forEach(function(k){ if(state[k[0]])h+='<span class="cchip">'+k[1]+': '+esc(state[k[0]])+'</span>' });
+      if(state.contact)h+='<span class="cchip">контакт: '+esc(state.contact)+'</span>';
+    }
+    collected.innerHTML=h;
+  }
+  function setv(id,val){var el=document.getElementById(id);if(el)el.textContent=val||'—'}
+  function syncLead(){
+    var r=(rec[state.niche]&&rec[state.niche][state.pain]);
+    setv('ld-niche',state.niche); setv('ld-leads',state.leads); setv('ld-channel',state.channel);
+    setv('ld-pain',state.pain); setv('ld-team',state.team); setv('ld-stack',state.stack);
+    setv('ld-term',state.term); setv('ld-rec',r?r[0]:null);
+    setv('ld-branch',branch?('ветка '+branch):(state.contact?'ветка B (не завершил)':null));
+    var el=document.getElementById('ld-score');
+    if(el){ if(logs.length){var st=branch?brLabel[branch]:statusOf(Math.min(100,score));el.textContent=Math.min(100,score)+' / 100 — '+st[0]} else el.textContent='—' }
+  }
+  function syncBranch(){
+    var cur=branch||(state.contact?'B':(logs.length?'A':null));
+    document.querySelectorAll('#tree .br').forEach(function(el){
+      el.classList.toggle('on', cur!==null && el.getAttribute('data-br')===cur);
+    });
+  }
+  function syncAll(){syncCollected();syncLead();syncBranch()}
+  renderStep(0); syncAll();
+
+  /* ================= ДЕМО 3 · чат-бот ================= */
+  var chatNodes={
+    start:{bot:'Здравствуйте! Я ассистент компании — отвечаю сразу и круглосуточно. С чем помочь?',
+      opts:[{t:'Сколько это стоит?',n:'price'},{t:'Хочу записаться',n:'book'},{t:'Где мой заказ?',n:'order'}]},
+    price:{bot:'Зависит от объёма. Считаем под одну задачу или на несколько направлений?',
+      sys:[['БАЗА ЗНАНИЙ','нашёл актуальный прайс и условия'],['CRM','создан контакт · источник: Telegram']],
+      opts:[{t:'Одна задача',n:'price1'},{t:'Несколько направлений',n:'price2'}]},
+    price1:{bot:'Для одной задачи есть понятная вилка — в рабочей версии здесь ваш реальный прайс. Прислать точный расчёт под ваши условия?',
+      sys:[['СКОРИНГ','интерес к цене · +15']],
+      opts:[{t:'Да, пришлите расчёт',n:'hot'},{t:'Пока просто смотрю',n:'cold'}]},
+    price2:{bot:'На несколько направлений считаем пакетом — там другая логика и другая цена. Такое лучше обсудить голосом: подключить менеджера?',
+      sys:[['СКОРИНГ','крупный запрос · +25'],['СЕГМЕНТ','приоритетный клиент']],
+      opts:[{t:'Да, подключайте',n:'hot'},{t:'Сначала материалы',n:'cold'}]},
+    hot:{bot:'Готово. Менеджер напишет в ближайшие 15 минут — он уже видит вашу карточку и не будет спрашивать всё заново.',
+      sys:[['TELEGRAM','алерт менеджеру: горячий лид'],['ЗАДАЧА','связаться · дедлайн 15 минут'],['CRM','сделка создана, статус: горячий']],end:true},
+    cold:{bot:'Хорошо, не тороплю. Пришлю короткий разбор задачи вашего типа — если станет актуально, просто напишите сюда.',
+      sys:[['СЕГМЕНТ','ветка догрева · тёплый'],['ПЛАН','касание через 3 дня'],['CRM','контакт сохранён с историей диалога']],end:true},
+    book:{bot:'Смотрю свободное время. Есть завтра в 14:00 и пятница в 11:00. Что удобнее?',
+      sys:[['КАЛЕНДАРЬ','проверил свободные слоты']],
+      opts:[{t:'Завтра 14:00',n:'book1'},{t:'Пятница 11:00',n:'book2'}]},
+    book1:{bot:'Записал вас на завтра, 14:00. Напомню за два часа. Если планы изменятся — напишите сюда, перенесу.',
+      sys:[['КАЛЕНДАРЬ','слот забронирован · завтра 14:00'],['НАПОМИНАНИЕ','за 2 часа до визита'],['CRM','сделка «Запись» создана'],['ОТЗЫВ','запрос запланирован на следующий день']],end:true},
+    book2:{bot:'Записал вас на пятницу, 11:00. Напомню за два часа. Если планы изменятся — напишите сюда, перенесу.',
+      sys:[['КАЛЕНДАРЬ','слот забронирован · пятница 11:00'],['НАПОМИНАНИЕ','за 2 часа до визита'],['CRM','сделка «Запись» создана'],['ОТЗЫВ','запрос запланирован на следующий день']],end:true},
+    order:{bot:'Назовите номер заказа — посмотрю статус.',
+      opts:[{t:'№ 10482',n:'order1'}]},
+    order1:{bot:'Заказ № 10482 собран и передан в доставку сегодня утром. Ориентир — завтра до 18:00. Трек пришлю сюда, как только появится.',
+      sys:[['ИНТЕГРАЦИЯ','статус получен из вашей системы'],['ПОДПИСКА','уведомлю клиента при смене статуса']],
+      opts:[{t:'Спасибо!',n:'thanks'},{t:'Нужен ещё один заказ',n:'price'}]},
+    thanks:{bot:'Обращайтесь. Я тут всегда — и в три ночи тоже.',
+      sys:[['ОТЗЫВ','запрос отзыва запланирован'],['СЕГМЕНТ','повторная продажа через 30 дней']],end:true}
+  };
+  var bubbles=document.getElementById('bubbles'), quick=document.getElementById('quick'), syslog=document.getElementById('syslog');
+  var sysHas=false, chatTimer=null;
+  function addBub(who,text){
+    var d=document.createElement('div');
+    d.className='bub '+(who==='me'?'me':'bot');
+    d.innerHTML='<span class="who">'+(who==='me'?'вы':'бот')+'</span>'+esc(text);
+    bubbles.appendChild(d);
+  }
+  function addSys(list){
+    if(!list||!list.length)return;
+    if(!sysHas){syslog.innerHTML='';sysHas=true}
+    list.forEach(function(s,k){
+      setTimeout(function(){
+        var d=document.createElement('div');
+        d.className='sysline'+(k%2?' m':'');
+        d.innerHTML='<i>['+esc(s[0])+']</i>'+esc(s[1]);
+        syslog.appendChild(d);
+      },180*(k+1));
+    });
+  }
+  function chatGo(key){
+    var node=chatNodes[key]; if(!node)return;
+    quick.innerHTML='<span class="typing">бот печатает…</span>';
+    if(chatTimer)clearTimeout(chatTimer);
+    chatTimer=setTimeout(function(){
+      addBub('bot',node.bot);
+      addSys(node.sys);
+      quick.innerHTML='';
+      if(node.end){
+        var r=document.createElement('button');
+        r.type='button'; r.className='restart'; r.textContent='↺ начать диалог заново';
+        r.onclick=chatReset; quick.appendChild(r);
+        return;
+      }
+      node.opts.forEach(function(o){
+        var b=document.createElement('button');
+        b.type='button'; b.className='qb'; b.textContent=o.t;
+        b.onclick=function(){ addBub('me',o.t); chatGo(o.n) };
+        quick.appendChild(b);
+      });
+    },520);
+  }
+  function chatReset(){
+    bubbles.innerHTML=''; sysHas=false;
+    syslog.innerHTML='<div class="sysempty">Пока тихо.<br>Начните диалог слева — здесь появятся действия, которые бот делает сам.</div>';
+    chatGo('start');
+  }
+  chatReset();
+
+  /* ================= ДЕМО 4 · сеть агентов ================= */
+  var agTasks=[
+    {t:'Собрать 50 компаний по нише',
+     nodes:[['Оркестратор','разбирает задачу'],['Поиск','ищет компании'],['Обогащение','находит контакты'],['Проверка','отсеивает мусор'],['CRM','записывает результат']],
+     logs:['Оркестратор: задача разложена на 4 шага, назначены исполнители',
+           'Поиск: обход открытых источников по нише и региону',
+           'Обогащение: сайт, почта, телефон, ответственное лицо',
+           'Проверка: дубли и нерабочие контакты удалены',
+           'CRM: 50 карточек созданы, помечены источником и датой'],
+     fin:'Результат: готовый список в CRM. Человек подключается на этапе «кому пишем первым».'},
+    {t:'Сделать отчёт за неделю',
+     nodes:[['Оркестратор','ставит задачу'],['Сбор данных','тянет цифры'],['Аналитик','считает'],['Оформление','собирает отчёт'],['Отправка','шлёт в Telegram']],
+     logs:['Оркестратор: период — прошлая неделя, источники подключены',
+           'Сбор данных: выгрузка из CRM, таблиц и рекламных кабинетов',
+           'Аналитик: заявки, продажи, конверсия, сравнение с прошлой неделей',
+           'Оформление: короткая сводка + три цифры, которые важны',
+           'Отправка: отчёт ушёл в Telegram руководителю'],
+     fin:'Результат: отчёт в 9:00 без единого ручного действия. Раньше — полдня работы.'},
+    {t:'Разобрать входящую почту',
+     nodes:[['Оркестратор','запускает разбор'],['Классификатор','сортирует'],['Черновики','пишет ответы'],['Проверяющий','сверяет факты'],['Утверждение','отдаёт человеку']],
+     logs:['Оркестратор: 84 письма за сутки взяты в работу',
+           'Классификатор: заявки, счета, спам, вопросы по текущим заказам',
+           'Черновики: ответы по шаблонам компании, с данными из CRM',
+           'Проверяющий: сверка цен и сроков с базой знаний, спорное — на паузу',
+           'Утверждение: 61 черновик готов к отправке, 6 требуют решения человека'],
+     fin:'Результат: вместо разбора почты — просмотр готовых ответов и одна кнопка.'}
+  ];
+  var agPick=document.getElementById('ag-pick'), agNodes=document.getElementById('ag-nodes'),
+      agLog=document.getElementById('ag-log'), agState=document.getElementById('ag-state');
+  var agTimers=[];
+  function agClear(){agTimers.forEach(clearTimeout);agTimers=[]}
+  function agRender(idx){
+    agClear();
+    [].slice.call(agPick.children).forEach(function(b,k){b.classList.toggle('on',k===idx)});
+    var task=agTasks[idx];
+    agNodes.innerHTML='';
+    task.nodes.forEach(function(n,k){
+      var d=document.createElement('div');
+      d.className='ag';
+      d.innerHTML='<div class="an">агент '+pad(k+1)+'</div><div class="at">'+esc(n[0])+'</div><div class="as">ожидает</div>';
+      agNodes.appendChild(d);
+    });
+    agLog.innerHTML='';
+    agState.textContent='ВЫПОЛНЯЕТСЯ';
+    var cards=[].slice.call(agNodes.children);
+    task.nodes.forEach(function(n,k){
+      agTimers.push(setTimeout(function(){
+        cards.forEach(function(c,j){if(j<k){c.className='ag done';c.querySelector('.as').textContent='готово'}});
+        cards[k].className='ag run';
+        cards[k].querySelector('.as').textContent=n[1]+'…';
+        var d=document.createElement('div');
+        d.innerHTML='<b>['+pad(k+1)+']</b> '+esc(task.logs[k]);
+        agLog.appendChild(d);
+      },k*1000));
+    });
+    agTimers.push(setTimeout(function(){
+      cards.forEach(function(c){c.className='ag done';c.querySelector('.as').textContent='готово'});
+      var d=document.createElement('div');
+      d.className='fin'; d.style.marginTop='10px';
+      d.textContent='▸ '+task.fin;
+      agLog.appendChild(d);
+      agState.textContent='ЗАДАЧА ЗАКРЫТА';
+    },task.nodes.length*1000+300));
+  }
+  agTasks.forEach(function(t,k){
+    var b=document.createElement('button');
+    b.type='button'; b.className='pk-b'; b.textContent=t.t;
+    b.onclick=function(){agRender(k)};
+    agPick.appendChild(b);
+  });
+
+  /* ================= ДЕМО 5 · конструктор сценария ================= */
+  var hooks=[
+    {t:'Пришла заявка с сайта',
+     steps:[['Проверить, не писал ли уже','Ищет контакт в базе: новый клиент или повторное обращение — разговор будет разным.'],
+            ['Задать уточняющие вопросы','В мессенджере, сразу. Пока человек рядом, а не через час.'],
+            ['Создать сделку с карточкой','Ниша, задача, объём, срок — всё уже внутри, менеджеру не нужно переспрашивать.'],
+            ['Отправить менеджеру алерт','В Telegram, с карточкой и приоритетом.'],
+            ['Проконтролировать','Не связались за 2 часа — напоминание менеджеру, за 4 — уведомление руководителю.']]},
+    {t:'Клиент не отвечает 3 дня',
+     steps:[['Проверить стадию сделки','Отвал на этапе цены и отвал после КП лечатся по-разному.'],
+            ['Отправить мягкое напоминание','Одно короткое сообщение в том же канале, где общались.'],
+            ['Предложить полезное','Разбор задачи его типа вместо «ну что, надумали?».'],
+            ['Перевести в базу','Молчит и после — уходит в редкие касания, менеджер не тратит время.'],
+            ['Поднять при активности','Открыл, кликнул, вернулся — сделка снова становится активной.']]},
+    {t:'Пришла оплата',
+     steps:[['Сформировать документы','Счёт, акт, договор по шаблону — из данных сделки, без ручного заполнения.'],
+            ['Подтвердить клиенту','Сообщение с чеком, сроками и инструкцией, что дальше.'],
+            ['Поставить задачу на исполнение','Ответственному, с дедлайном и всеми данными заказа.'],
+            ['Запланировать отзыв','Через N дней после выполнения — автоматический запрос.'],
+            ['Обновить отчётность','Сумма попадает в дневную сводку без ручного ввода.']]},
+    {t:'Каждое утро в 9:00',
+     steps:[['Собрать данные за вчера','CRM, таблицы, кассы, рекламные кабинеты — всё, что подключено.'],
+            ['Посчитать главное','Заявки, продажи, конверсия, средний чек.'],
+            ['Сравнить','С прошлой неделей и с планом — чтобы видеть тренд, а не голое число.'],
+            ['Прислать сводку','Коротко, в Telegram, до первой чашки кофе.'],
+            ['Отдельно — список звонков','Кому звонить первым сегодня и почему.']]},
+    {t:'Появился новый файл в папке',
+     steps:[['Определить тип документа','Счёт, накладная, договор, резюме — распознаёт сам.'],
+            ['Вытащить данные','Суммы, даты, реквизиты, ключевые пункты.'],
+            ['Записать в систему','Таблица или CRM — туда, где это реально используют.'],
+            ['Разложить по местам','Переименовать по правилу и убрать в нужную папку.'],
+            ['Сообщить о проблеме','Данных не хватает или документ странный — пишет человеку, а не молчит.']]},
+    {t:'Пропущенный звонок',
+     steps:[['Узнать, кто звонил','Определяет клиента по номеру и поднимает историю общения.'],
+            ['Написать сразу','Сообщение в мессенджер за секунды: «видел ваш звонок, чем помочь?».'],
+            ['Предложить время','Два конкретных слота вместо «мы вам перезвоним».'],
+            ['Создать задачу','Менеджеру, с историей и причиной обращения.'],
+            ['Зафиксировать','Всё попадает в карточку клиента — звонок не теряется.']]}
+  ];
+  var hkPick=document.getElementById('hk-pick'), hkOut=document.getElementById('hk-out'), hkState=document.getElementById('hk-state');
+  function hkRender(idx){
+    [].slice.call(hkPick.children).forEach(function(b,k){b.classList.toggle('on',k===idx)});
+    var h=hooks[idx];
+    hkState.textContent='СЦЕНАРИЙ СОБРАН';
+    var html='<div class="chain"><div class="chain-step trig"><span class="n">·</span><div><div class="ct">'+esc(h.t)+'</div><div class="cd">Повод. Дальше система работает без человека.</div></div></div>';
+    h.steps.forEach(function(s,k){
+      html+='<div class="chain-step" style="animation-delay:'+(k*60)+'ms"><span class="n">'+pad(k+1)+'</span><div><div class="ct">'+esc(s[0])+'</div><div class="cd">'+esc(s[1])+'</div></div></div>';
+    });
+    html+='</div><div class="cap-note">Любой шаг меняется под ваш процесс: другой канал, другой ответственный, другие сроки. Это конструктор, а не коробка.</div>';
+    hkOut.innerHTML=html;
+  }
+  hooks.forEach(function(h,k){
+    var b=document.createElement('button');
+    b.type='button'; b.className='pk-b'; b.textContent=h.t;
+    b.onclick=function(){hkRender(k)};
+    hkPick.appendChild(b);
+  });
+
+  /* ================= контакт ================= */
+  function tgLink(br){
+    var nick=(typeof TG!=='undefined'&&TG?TG:'').replace(/^@/,'');
+    if(!nick)return '#';
+    var txt='Здравствуйте! Прошёл вашу презентацию';
+    if(state.niche)txt+=' — у меня '+state.niche.toLowerCase();
+    if(state.pain)txt+=', болит: '+state.pain.toLowerCase();
+    txt+='. Хочу обсудить.';
+    return 'https://t.me/'+nick+'?text='+encodeURIComponent(txt);
+  }
+  var tgFinal=document.getElementById('tg-final');
+  if(tgFinal){
+    var nick=(typeof TG!=='undefined'&&TG?TG:'').replace(/^@/,'');
+    if(nick){ tgFinal.href='https://t.me/'+nick; tgFinal.innerHTML='✈ Написать в Telegram · @'+nick }
+    else { tgFinal.classList.add('ghost'); tgFinal.textContent='укажите ник в блоке НАСТРОЙКА вверху файла' }
+  }
+
+  /* ================= start ================= */
+  function fromHash(){
+    var id=(location.hash||'').replace(/^#/,'');
+    if(!id||!els[id])return show(0);
+    var at=route.indexOf(id);
+    if(at>=0)return show(at);
+    for(var k in tracks){ if(tracks[k].ids.indexOf(id)>=0){ setRoute(k); return show(route.indexOf(id)) } }
+    show(0);
+  }
+  fromHash();
+})();
+</script>
+</body>
+</html>
