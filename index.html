@@ -851,6 +851,52 @@ body.reading .pt{opacity:.35!important}
 .depth::after{background:radial-gradient(62% 50% at 50% 48%,rgba(2,1,8,.99) 26%,rgba(2,1,8,.82) 58%,rgba(2,1,8,.35) 84%,transparent 100%)}
 body.reading .camwrap{opacity:.3}
 body.pano .camwrap{filter:saturate(1.1) brightness(1.05)}
+
+/* ═══════════════ облегчённый режим для телефонов ═══════════════ */
+@media (max-width:900px){
+  /* 1. главный виновник: размытие фона под каждым стеклом */
+  .card,.hb,.lang,.term,.prize,.lead,.fs,.tl>div,.quote,.stream,.chip,.bub,.ri,.pk,.opt,.msg,.tv,.egg{
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  .card,.hb,.lang,.fs,.tl>div,.quote{background:rgba(11,7,24,.9)!important;box-shadow:none!important}
+  .term{background:rgba(6,3,16,.94)!important;box-shadow:none!important}
+  .prize{background:rgba(3,26,34,.94)!important;box-shadow:none!important}
+  .lead,.stream,.bub,.chip,.msg,.opt,.pk,.ri{background:rgba(11,7,24,.88)!important}
+  .bub.me{background:rgba(48,10,30,.9)!important}
+  .msg.hit{background:rgba(58,10,36,.92)!important}
+  .vs>div:first-child{background:rgba(9,6,20,.85)!important}
+  .vs>div:last-child{background:rgba(6,18,32,.9)!important}
+  .egg{background:rgba(6,16,28,.95)!important;box-shadow:none!important}
+  .topbar{backdrop-filter:none!important}
+
+  /* 2. SVG-фильтры: свечение считается каждый кадр */
+  .sc-fiber .pulse,.rm-lamp polygon,.near-fx .pulse{filter:none!important}
+
+  /* 3. лишние слои фона целиком */
+  .orb,.haze,.beam,.near-fx,.dust,.depth,.warp{display:none!important}
+  .rm-ceil,.rm-wall,.rm-racks .vent,.rm-racks .top,.rm-tray .bed{display:none!important}
+  .rm-racks .led:nth-of-type(2n){display:none}
+  .sc-fiber .pulse:nth-of-type(n+4){display:none}
+  .sc-scan{display:none}
+  .scene{animation:none!important;opacity:.5}
+  .camwrap{transition:none!important;transform:none!important;filter:none!important}
+
+  /* 4. дорогие переходы контента */
+  *{will-change:auto!important}
+  .slide>*{animation:liteIn .32s ease-out backwards!important}
+  .slide>*:nth-child(n+3){animation-delay:.05s!important}
+  @keyframes liteIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .cards .card,.hub .hb,.langwrap .lang,.flow .fs,.rows .row,.rt .ri{animation:none!important}
+  .card,.hb,.lang{background-image:none!important;transition:border-color .15s!important}
+  .card::after,.hb::after,.lang::after,.prize::after,.lang::before,.hb::before{display:none}
+
+  /* 5. лампа на заголовке: только мигание, без теней и срезов */
+  .slide h1{animation:hIn .5s ease-out backwards, liteStrike 1.1s steps(1) .05s both!important;text-shadow:none!important}
+  .slide h1::before{display:none}
+  .slide h1.gl{animation:liteBurst .3s steps(1)!important}
+  @keyframes liteStrike{0%{opacity:.05}2%{opacity:1}4%{opacity:.06}7%{opacity:.95}9%{opacity:.05}
+    12%{opacity:1}15%{opacity:.1}20%{opacity:1}26%{opacity:.3}32%{opacity:1}100%{opacity:1}}
+  @keyframes liteBurst{0%{opacity:1}20%{opacity:.25}38%{opacity:1}58%{opacity:.5}100%{opacity:1}}
+}
 </style>
 </head>
 <body>
@@ -2311,9 +2357,19 @@ demo:{
 }};
 
 /* ─── камера: пролёт по серверной и панорама в конце ─── */
+var LITE=(function(){
+  try{
+    var w=window.innerWidth||document.documentElement.clientWidth||0;
+    if(w&&w<=900)return true;                                  // телефоны и узкие экраны
+    var touch=("ontouchstart" in window)||(navigator.maxTouchPoints>0);
+    var cores=navigator.hardwareConcurrency||8;
+    return !!(touch&&cores<=4&&w<=1200);                        // слабые планшеты
+  }catch(e){return false}
+})();
 var CAM=(function(){
   var wraps=[];
   function init(){
+    if(LITE)return;
     [].slice.call(document.querySelectorAll(".par")).forEach(function(l){
       var w=document.createElement("div");
       w.className="camwrap";
@@ -2327,6 +2383,7 @@ var CAM=(function(){
   /* насколько сильно каждый слой реагирует на шаг камеры: дальний почти стоит, ближний летит */
   var K=[[0.03,0.5],[0.07,1.4],[0.09,1.9],[0.14,2.8]];   // [прирост масштаба, снос по X в %]
   function go(p,last){
+    if(LITE){document.body.classList.toggle("pano",!!last);return}
     wraps.forEach(function(w){
       var k=K[+w.getAttribute("data-k")];
       var sc,x;
@@ -2512,7 +2569,7 @@ function lampGlitch(){
       burst();
       if(Math.random()<.35)dt(burst,420+Math.random()*500);
       plan();
-    },5000+Math.random()*13000);
+    },(typeof LITE!=="undefined"&&LITE?11000:5000)+Math.random()*13000);
   }
   dt(plan,1600);
 }
@@ -2839,7 +2896,7 @@ document.addEventListener("mousemove",function(e){
 (function(){
   var host=document.getElementById("dust");
   if(host){
-    var N=window.innerWidth<900?0:26;
+    var N=(typeof LITE!=="undefined"&&LITE)?0:26;
     for(var i=0;i<N;i++){
       var p=document.createElement("i");p.className="pt";
       var z=Math.random();                       // 0 — далеко, 1 — близко
@@ -2868,6 +2925,7 @@ document.addEventListener("mousemove",function(e){
   }
   function kick(){if(!raf)raf=requestAnimationFrame(loop)}
   var rm=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(typeof LITE!=="undefined"&&LITE)return;   /* на телефоне параллакс выключен */
   if(!rm){
     window.addEventListener("mousemove",function(e){
       tx=(e.clientX/window.innerWidth-.5)*-34;
